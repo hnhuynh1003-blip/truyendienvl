@@ -122,12 +122,13 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .btn:hover, .btn:active { background: var(--accent); color: #0b0c10; }
+    .btn:hover:not(:disabled), .btn:active:not(:disabled) { background: var(--accent); color: #0b0c10; }
     .btn-primary { background: var(--accent); color: #0b0c10; font-weight: 600; }
     .btn-gold { background: var(--gold); border-color: var(--gold); color: #0b0c10; font-weight: 600; }
-    .btn-gold:hover { background: #d97706; border-color: #d97706; color: #fff; }
+    .btn-gold:hover:not(:disabled) { background: #d97706; border-color: #d97706; color: #fff; }
     .btn-danger { border-color: var(--red); color: var(--red); }
-    .btn-danger:hover { background: var(--red); color: #fff; }
+    .btn-danger:hover:not(:disabled) { background: var(--red); color: #fff; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; border-color: #475569; color: #94a3b8; }
 
     .container {
       max-width: 860px;
@@ -295,7 +296,6 @@
     }
     .novel-card:hover { border-color: var(--accent); transform: translateY(-3px); }
 
-    /* BÌA TRUYỆN TRANG CHỦ (SẠCH SẼ HOÀN TOÀN) */
     .novel-cover {
       width: 110px;
       min-width: 110px;
@@ -669,7 +669,7 @@
       <!-- HỘP RƠI BẢO VẬT HỆ THỐNG -->
       <div class="reader-loot-box">
         <div style="font-size: 13px; font-weight: bold; color: var(--gold); margin-bottom: 6px;">🎁 TÀN TÍCH DỮ LIỆU CUỐI CHƯƠNG</div>
-        <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 10px;">Đọc xong chương, hãy lục lọi bảo vật hoặc trang bị ngẫu nhiên.</p>
+        <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 10px;">Đọc xong chương, hệ thống mở khóa ngay 1 lượt lục lọi tàn tích không cần chờ!</p>
         <button class="btn btn-primary" onclick="rollLootDrop(true)">🎲 Lục Lọi Bảo Vật Ngay</button>
       </div>
 
@@ -761,12 +761,12 @@
         <button class="btn" style="width: 100%; font-size: 11px;" onclick="changeAuthorName()">Đổi Bút Danh</button>
       </div>
 
-      <!-- APP: KHO ĐỒ -->
+      <!-- APP: KHO ĐỒ (CÓ NÚT KHÓA ĐẾM NGƯỢC THỜI GIAN THẬT) -->
       <div class="phone-sub-app" id="phone-app-inventory">
         <div class="phone-app-header">
           <button class="phone-back-btn" onclick="phoneHome()">‹</button>
           <span>Kho Đồ Kẻ Lang Bạt</span>
-          <button class="btn" style="padding: 2px 6px; font-size: 9px;" onclick="rollLootDrop(true)">🎲 Nhặt đồ</button>
+          <button class="btn" id="btn-inventory-loot" style="padding: 2px 8px; font-size: 10px;" onclick="rollLootDrop(false)">🎲 Nhặt đồ</button>
         </div>
         
         <div style="display:flex; gap:4px; margin-bottom:10px;">
@@ -1127,6 +1127,11 @@
     let questTab = "ALL";
     let isZen = false;
 
+    // THỜI GIAN HỒI CHIÊU NHẶT ĐỒ (COOLDOWN 10 PHÚT)
+    const COOLDOWN_DURATION = 10 * 60 * 1000;
+    let lastLootTimestamp = parseInt(localStorage.getItem('my_last_loot_ts')) || 0;
+    let cooldownTimerInterval = null;
+
     function applyUserRole() {
       const btn = document.getElementById('role-toggle-btn');
       if (userProfile.role === 'admin') {
@@ -1147,7 +1152,7 @@
     }
 
     // ==========================================
-    // CƠ CHẾ LƯU & ĐỒNG BỘ CHUẨN XÁC
+    // CƠ CHẾ LƯU & ĐỒNG BỘ CHỐNG ĐÈ TỪ ĐIỆN THOẠI
     // ==========================================
     function saveDB() {
       localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
@@ -1170,9 +1175,6 @@
       });
     }
 
-    // CƠ CHẾ ĐỒNG BỘ 1 CHIỀU AN TOÀN - CHỐNG ĐÈ DỮ LIỆU TỪ ĐIỆN THOẠI
-    let hasLoadedCloud = false;
-
     docRef.onSnapshot((doc) => {
       const indicator = document.getElementById('cloud-indicator');
       if (doc.exists) {
@@ -1186,40 +1188,7 @@
           localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
         }
 
-        if (data.userProfile) {
-          const curRole = userProfile.role;
-          const cloudP = data.userProfile;
-
-          userProfile.name = cloudP.name || userProfile.name;
-          userProfile.title = cloudP.title || userProfile.title;
-          userProfile.level = Math.max(parseInt(userProfile.level) || 1, parseInt(cloudP.level) || 1);
-          userProfile.exp = Math.max(parseInt(userProfile.exp) || 0, parseInt(cloudP.exp) || 0);
-          userProfile.currency = Math.max(parseInt(userProfile.currency) || 0, parseInt(cloudP.currency) || 0);
-          userProfile.role = curRole;
-
-          if (cloudP.inventory && Array.isArray(cloudP.inventory)) userProfile.inventory = cloudP.inventory;
-          if (cloudP.quests && Array.isArray(cloudP.quests)) userProfile.quests = cloudP.quests;
-
-          localStorage.setItem('my_cyber_profile', JSON.stringify(userProfile));
-        }
-
-        hasLoadedCloud = true;
-        renderHome();
-        updatePhoneUI();
-        if (indicator) indicator.textContent = "☁️ Đã đồng bộ";
-      } else {
-        // TUYỆT ĐỐI KHÔNG TỰ ĐỘNG saveDB() KHI Ở ĐIỆN THOẠI ĐỂ TRÁNH ĐÈ RỖNG
-        if (indicator) indicator.textContent = "☁️ Đám mây sẵn sàng";
-      }
-    }, (err) => {
-      console.warn("Lỗi kết nối Firestore:", err);
-      const indicator = document.getElementById('cloud-indicator');
-      if (indicator) indicator.textContent = "⚠️ Offline mode";
-      renderHome();
-      updatePhoneUI();
-    });
-
-        // Hợp nhất dữ liệu an toàn - chống đè mất cấp độ và xu
+        // Hợp nhất dữ liệu an toàn - ưu tiên giữ số liệu cao nhất
         if (data.userProfile) {
           const curRole = userProfile.role;
           const cloudP = data.userProfile;
@@ -1237,16 +1206,16 @@
           if (cloudP.quests && Array.isArray(cloudP.quests)) {
             userProfile.quests = cloudP.quests;
           }
+          localStorage.setItem('my_cyber_profile', JSON.stringify(userProfile));
         }
 
-        localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
-        localStorage.setItem('my_cyber_profile', JSON.stringify(userProfile));
         renderHome();
         updatePhoneUI();
 
-        if (indicator) indicator.textContent = "☁️ Đã kết nối đám mây";
+        if (indicator) indicator.textContent = "☁️ Đã đồng bộ";
       } else {
-        saveDB();
+        // Điện thoại hoặc thiết bị mới tuyệt đối không tự ý gọi saveDB() khi Firebase chưa có dữ liệu
+        if (indicator) indicator.textContent = "☁️ Sẵn sàng";
       }
     }, (err) => {
       const indicator = document.getElementById('cloud-indicator');
@@ -1255,7 +1224,6 @@
       updatePhoneUI();
     });
 
-    // CẬP NHẬT GIAO DIỆN HỆ THỐNG PHONE AN TOÀN
     function updatePhoneUI() {
       userProfile.level = Math.max(1, parseInt(userProfile.level) || 1);
       userProfile.exp = Math.max(0, parseInt(userProfile.exp) || 0);
@@ -1363,20 +1331,53 @@
       advanceQuest('q_hidden_glitch', 1);
     }
 
-    // HỆ THỐNG GACHA VÔ HẠN LƯU - TỈ LỆ KHẮC NGHIỆT
-    let lastLootTime = parseInt(localStorage.getItem('my_last_loot_time')) || 0;
+    // ==========================================
+    // CƠ CHẾ GACHA VÔ HẠN LƯU & KHÓA NÚT THỜI GIAN THẬT
+    // ==========================================
+    function startCooldownTicker() {
+      if (cooldownTimerInterval) clearInterval(cooldownTimerInterval);
+
+      function updateBtnState() {
+        const btn = document.getElementById('btn-inventory-loot');
+        if (!btn) return;
+
+        const now = Date.now();
+        const diff = now - lastLootTimestamp;
+
+        if (diff < COOLDOWN_DURATION) {
+          const remainSec = Math.ceil((COOLDOWN_DURATION - diff) / 1000);
+          const mins = Math.floor(remainSec / 60);
+          const secs = remainSec % 60;
+          const timeFormatted = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+          btn.disabled = true;
+          btn.textContent = `⏳ Chờ ${timeFormatted}`;
+        } else {
+          btn.disabled = false;
+          btn.textContent = `🎲 Nhặt đồ`;
+          clearInterval(cooldownTimerInterval);
+          cooldownTimerInterval = null;
+        }
+      }
+
+      updateBtnState();
+      cooldownTimerInterval = setInterval(updateBtnState, 1000);
+    }
 
     function rollLootDrop(isFreeFromChapter = false) {
       const now = Date.now();
-      const cooldownMs = 10 * 60 * 1000; // Hồi chiêu 10 phút
 
-      if (!isFreeFromChapter && (now - lastLootTime < cooldownMs)) {
-        const remainingMinutes = Math.ceil((cooldownMs - (now - lastLootTime)) / 60000);
-        showSystemAlert("HỆ THỐNG ĐANG NẠP LẠI", `Vui lòng chờ ${remainingMinutes} phút hoặc đọc thêm 1 chương để nhặt tiếp!`);
+      // Nếu bấm từ kho đồ và chưa hết thời gian chờ
+      if (!isFreeFromChapter && (now - lastLootTimestamp < COOLDOWN_DURATION)) {
+        const remainSec = Math.ceil((COOLDOWN_DURATION - (now - lastLootTimestamp)) / 1000);
+        const mins = Math.floor(remainSec / 60);
+        const secs = remainSec % 60;
+        showSystemAlert("HỆ THỐNG ĐANG NẠP LẠI", `Vui lòng chờ ${mins}p ${secs}s hoặc đọc xong 1 chương để nhặt tiếp!`);
         return;
       }
 
-      const roll = Math.random() * 10000; // Random từ 0 đến 10000 (0.01% đơn vị)
+      // TỈ LỆ GACHA VÔ HẠN LƯU KHẮC NGHIỆT (Chuẩn xác 1/10000)
+      const roll = Math.random() * 10000;
       let targetRank = "F";
 
       if (roll < 5000) targetRank = "F";        // 50%
@@ -1392,7 +1393,7 @@
       const pool = MASTER_LOOT_TABLE.filter(item => item.rank === targetRank);
       const picked = pool[Math.floor(Math.random() * pool.length)] || MASTER_LOOT_TABLE[0];
 
-      // Xu rơi tương ứng với phẩm cấp
+      // Thưởng xu theo phẩm cấp
       let bonusCoins = Math.floor(Math.random() * 3) + 1; // Mặc định chỉ 1-3 xu
       if (["B", "A"].includes(targetRank)) bonusCoins = 15;
       if (["S", "SS"].includes(targetRank)) bonusCoins = 50;
@@ -1402,8 +1403,10 @@
       userProfile.inventory.unshift({ ...picked, instanceId: "item-" + Date.now() });
       addExp(targetRank === 'SSS' ? 100 : (targetRank === 'S' ? 40 : 10));
 
-      lastLootTime = now;
-      localStorage.setItem('my_last_loot_time', now.toString());
+      // Cập nhật lại thời gian nhặt và bắt đầu khóa nút
+      lastLootTimestamp = now;
+      localStorage.setItem('my_last_loot_ts', now.toString());
+      startCooldownTicker();
 
       advanceQuest('q_daily_loot', 1);
 
@@ -1433,6 +1436,7 @@
       return novel.updatedAt || "2026-10-09";
     }
 
+    // TỰ ĐỘNG THU NHỎ & NÉN ẢNH CANVAS CHỐNG CRASH FIREBASE
     function handleCoverFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1511,7 +1515,7 @@
     // CƠ CHẾ NÚT ĐỌC NGAY / ĐỌC TIẾP THÔNG MINH
     // ==========================================
     function smartReadAction(novelIdx, event) {
-      if (event) event.stopPropagation(); // Không kích hoạt click vào thân card
+      if (event) event.stopPropagation();
 
       selectedNovelIndex = novelIdx;
       const novel = novels[novelIdx];
@@ -1524,11 +1528,9 @@
 
       const bookmark = JSON.parse(localStorage.getItem(`bookmark_${novel.id}`));
       
-      // Nếu có lịch sử đọc dở hợp lệ -> Đọc tiếp
       if (bookmark && typeof bookmark.chIdx === 'number' && novel.chapters[bookmark.chIdx]) {
         readChapter(bookmark.chIdx, bookmark.scrollTop || 0);
       } else {
-        // Chưa từng đọc -> Đọc ngay chương 1
         readChapter(0, 0);
       }
     }
@@ -1596,7 +1598,6 @@
         const coverBg = novel.coverImage ? `background-image: url('${novel.coverImage}');` : '';
         const tagBadgesHtml = (novel.genre || "Tiểu thuyết").split(/[,/]+/).map(t => `<span class="tag">${escapeHtml(t.trim())}</span>`).join(" ");
 
-        // Kiểm tra xem đã từng đọc truyện này chưa
         const bookmark = JSON.parse(localStorage.getItem(`bookmark_${novel.id}`));
         let readButtonText = "▶ Đọc ngay";
         let readButtonClass = "btn btn-primary";
@@ -1606,7 +1607,6 @@
           readButtonClass = "btn btn-gold";
         }
 
-        // BÌA TRANG CHỦ HOÀN TOÀN SẠCH CHỮ VÀ CÓ NÚT ĐỌC THÔNG MINH
         card.innerHTML = `
           <div class="novel-cover" style="${coverBg}"></div>
           <div class="novel-info">
@@ -1671,7 +1671,6 @@
       document.getElementById('intro-box-code').textContent = intro.code || "SYS_INITIALIZED";
       document.getElementById('book-intro').textContent = intro.text || novel.intro || "[ Không có dữ liệu văn án ]";
 
-      // Cập nhật trạng thái nút đọc chính ở trang bìa
       const bookmark = JSON.parse(localStorage.getItem(`bookmark_${novel.id}`));
       const mainReadBtn = document.getElementById('btn-main-reading-action');
 
@@ -1766,7 +1765,6 @@
       document.getElementById('btn-prev-ch').style.visibility = (chIdx > 0) ? 'visible' : 'hidden';
       document.getElementById('btn-next-ch').style.visibility = (chIdx < novel.chapters.length - 1) ? 'visible' : 'hidden';
 
-      // Lưu bookmark chương đang đọc
       localStorage.setItem(`bookmark_${novel.id}`, JSON.stringify({
         chIdx: chIdx,
         scrollTop: scrollPos || 0
@@ -2161,7 +2159,10 @@
     function togglePhone() {
       const phone = document.getElementById('cyber-phone');
       phone.style.display = (phone.style.display === 'flex') ? 'none' : 'flex';
-      if (phone.style.display === 'flex') updatePhoneUI();
+      if (phone.style.display === 'flex') {
+        updatePhoneUI();
+        startCooldownTicker();
+      }
     }
 
     function phoneHome() {
@@ -2179,6 +2180,7 @@
         renderCodexList();
       } else if (appName === 'inventory') {
         renderInventory();
+        startCooldownTicker();
       } else if (appName === 'quests') {
         renderQuests();
       } else if (appName === 'shop') {
@@ -2369,6 +2371,7 @@
 
     applyUserRole();
     renderHome();
+    startCooldownTicker();
   </script>
 </body>
 </html>
