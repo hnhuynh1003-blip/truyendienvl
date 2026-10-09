@@ -137,7 +137,93 @@
       display: none !important;
     }
 
-    /* MÀU PHẨM CẤP BẢO VẬT */
+    /* THANH TÌM KIẾM & BỘ LỌC NÂNG CAO */
+    .filter-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      background: var(--bg-main);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--text-white);
+      outline: none;
+      font-size: 13px;
+    }
+    .search-input:focus { border-color: var(--neon); }
+
+    .sort-select {
+      background: var(--bg-main);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: var(--neon);
+      outline: none;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .tag-chip {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--bg-main);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tag-chip:hover { border-color: var(--accent); color: var(--text-white); }
+    .tag-chip.active {
+      background: rgba(102, 252, 241, 0.15);
+      border-color: var(--neon);
+      color: var(--neon);
+      font-weight: bold;
+    }
+
+    .filter-status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 10px;
+    }
+
+    .filter-btn {
+      background: var(--bg-main);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .filter-btn.active { border-color: var(--neon); color: var(--neon); font-weight: bold; }
+
+    /* MÀU PHẨM CẤP */
     .rank-tag {
       font-size: 9px;
       font-weight: 800;
@@ -153,10 +239,27 @@
     .rank-B { background: #8b5cf6; color: #fff; }
     .rank-A { background: #d97706; color: #fff; }
     .rank-S { background: #ea580c; color: #fff; box-shadow: 0 0 6px #ea580c; }
-    .rank-SS { background: #e11d48; color: #fff; box-shadow: 0 0 8px #e11d48; animation: pulse 1.5s infinite; }
+    .rank-SS { background: #e11d48; color: #fff; box-shadow: 0 0 8px #e11d48; }
     .rank-SSS { background: linear-gradient(90deg, #ec4899, #eab308, #06b6d4); color: #000; font-weight: 900; box-shadow: 0 0 10px #eab308; }
 
-    @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+    /* POP-UP THÔNG BÁO HỆ THỐNG */
+    #system-alert-banner {
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 2px solid var(--neon);
+      border-radius: 8px;
+      padding: 12px 20px;
+      z-index: 2500;
+      box-shadow: 0 0 20px rgba(102, 252, 241, 0.5);
+      color: #fff;
+      text-align: center;
+      animation: alertSlide 0.3s ease;
+    }
+    @keyframes alertSlide { from { top: 30px; opacity: 0; } to { top: 60px; opacity: 1; } }
 
     /* GLITCH EFFECT */
     .glitch-text:hover {
@@ -171,30 +274,7 @@
       100% { transform: translate(0); }
     }
 
-    /* TỦ TRUYỆN */
-    .library-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .filter-group { display: flex; gap: 8px; align-items: center; }
-    .filter-btn {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      color: var(--text-dim);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .filter-btn.active { border-color: var(--neon); color: var(--neon); font-weight: bold; }
-
+    /* NOVEL GRID */
     .novel-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -252,14 +332,14 @@
     .tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); color: var(--text-dim); }
     .tag-status { color: var(--neon); border-color: var(--accent); }
 
-    .novel-title { font-size: 17px; font-weight: bold; color: var(--text-white); margin-bottom: 6px; }
+    .novel-title { font-size: 17px; font-weight: bold; color: var(--text-white); margin-bottom: 4px; }
     .novel-desc {
       font-size: 13px; color: var(--text-dim);
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 8px;
     }
     .novel-meta {
       display: flex; justify-content: space-between; align-items: center;
-      font-size: 12px; color: var(--accent); border-top: 1px solid var(--border); padding-top: 8px;
+      font-size: 11px; color: var(--accent); border-top: 1px solid var(--border); padding-top: 8px;
     }
 
     /* TRANG BÌA & MỤC LỤC */
@@ -373,7 +453,7 @@
     #phone-fab:hover { transform: scale(1.08); }
 
     #cyber-phone {
-      display: none; position: fixed; bottom: 90px; right: 24px; width: 345px; height: 570px;
+      display: none; position: fixed; bottom: 90px; right: 24px; width: 345px; height: 580px;
       background: #090d12; border: 3px solid #334155; border-radius: 36px;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 15px rgba(69, 162, 158, 0.3);
       z-index: 999; flex-direction: column; overflow: hidden;
@@ -416,11 +496,55 @@
     }
     .phone-back-btn { background: none; border: none; color: var(--neon); font-size: 14px; cursor: pointer; }
 
-    .item-card, .quest-card, .character-card {
+    .item-card, .character-card {
       background: #1a2230; border: 1px solid #334155; border-radius: 8px; padding: 8px; margin-bottom: 8px;
       display: flex; gap: 8px; align-items: center;
     }
     .item-card:hover { border-color: var(--accent); }
+
+    .quest-card {
+      background: #151e2b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .quest-card.ready-claim {
+      border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+    }
+    .quest-card.completed {
+      opacity: 0.6;
+      border-color: #1e293b;
+    }
+    .quest-type-tag {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .quest-type-MAIN { background: #dc2626; color: #fff; }
+    .quest-type-DAILY { background: #0284c7; color: #fff; }
+    .quest-type-HIDDEN { background: #9333ea; color: #fff; }
+
+    .quest-prog-bar {
+      background: #0f172a;
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 4px 0;
+    }
+    .quest-prog-fill {
+      background: var(--neon);
+      height: 100%;
+      transition: width 0.3s;
+    }
+
     .phone-home-bar { width: 80px; height: 4px; background: #475569; border-radius: 2px; margin: 6px auto; cursor: pointer; }
 
     /* ZEN MODE */
@@ -455,6 +579,12 @@
 
   <div class="reader-progress-bar" id="reading-bar"></div>
 
+  <!-- BANNER THÔNG BÁO HỆ THỐNG -->
+  <div id="system-alert-banner">
+    <div style="font-size:11px; color:var(--neon); font-weight:bold; letter-spacing:1px;" id="sys-alert-title">[HỆ THỐNG PHÁT ĐỘNG]</div>
+    <div style="font-size:13px; font-weight:bold; margin-top:2px;" id="sys-alert-body">Nhiệm vụ mới đã mở khóa!</div>
+  </div>
+
   <header>
     <div class="brand" onclick="goHome()">
       <span>✦ DUDU STUDIO</span>
@@ -470,17 +600,35 @@
 
     <!-- 1. TỦ TRUYỆN -->
     <div id="home-view">
-      <div class="library-toolbar">
-        <div>
-          <h2 style="color: var(--text-white); font-size: 20px;">Tủ Tiểu Thuyết Cá Nhân</h2>
-          <div style="font-size: 13px; color: var(--text-dim); margin-top: 2px;">Nhấn [P] để mở Hệ Thống • Đọc truyện để nhặt trang bị</div>
+      
+      <!-- BỘ LỌC TÌM KIẾM, TAG & THỜI GIAN -->
+      <div class="filter-panel">
+        <div class="search-row">
+          <input type="text" class="search-input" id="search-novel-input" placeholder="🔍 Tìm theo tên truyện, nhân vật hoặc nội dung..." oninput="onSearchChange()">
+          <select class="sort-select" id="sort-select-ctrl" onchange="onSortChange()">
+            <option value="NEWEST_UPDATE">⏱ Mới cập nhật nhất</option>
+            <option value="OLDEST_UPDATE">⏳ Cũ nhất</option>
+            <option value="MOST_CHAPTERS">📚 Nhiều chương nhất</option>
+            <option value="MOST_WORDS">🔤 Nhiều chữ nhất</option>
+          </select>
         </div>
-        <div class="filter-group">
-          <button class="filter-btn active" onclick="filterStatus('ALL', this)">Tất cả</button>
-          <button class="filter-btn" onclick="filterStatus('Đang ra', this)">Đang ra</button>
-          <button class="filter-btn" onclick="filterStatus('Hoàn thành', this)">Hoàn thành</button>
+
+        <div>
+          <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 6px;">Lọc theo Thể loại / Tag:</div>
+          <div class="tags-container" id="tag-cloud-container"></div>
+        </div>
+
+        <div class="filter-status-row">
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <span style="font-size: 11px; color: var(--text-dim);">Trạng thái:</span>
+            <button class="filter-btn active" onclick="filterStatus('ALL', this)">Tất cả</button>
+            <button class="filter-btn" onclick="filterStatus('Đang ra', this)">Đang ra</button>
+            <button class="filter-btn" onclick="filterStatus('Hoàn thành', this)">Hoàn thành</button>
+          </div>
+          <div style="font-size: 11px; color: var(--accent);" id="search-result-count">Hiển thị 1 truyện</div>
         </div>
       </div>
+
       <div class="novel-grid" id="novel-grid-container"></div>
     </div>
 
@@ -520,7 +668,7 @@
       <div class="intro-terminal-box">
         <div class="intro-header">
           <span id="intro-box-title">◆ VĂN ÁN // GLITCH RECORD</span>
-          <span class="glitch-text" id="intro-box-code" style="font-family:monospace; cursor:pointer;" title="Nhấp để nhận tín hiệu" onclick="triggerEasterEgg()">SYS_ERR_0x000F89</span>
+          <span class="glitch-text" id="intro-box-code" style="font-family:monospace; cursor:pointer;" title="Nhấp để giải mã" onclick="triggerEasterEgg()">SYS_ERR_0x000F89</span>
         </div>
         <div class="intro-text" id="book-intro">[ Chưa có văn án ]</div>
       </div>
@@ -554,7 +702,7 @@
       <!-- HỘP RƠI BẢO VẬT HỆ THỐNG -->
       <div class="reader-loot-box">
         <div style="font-size: 13px; font-weight: bold; color: var(--gold); margin-bottom: 6px;">🎁 TÀN TÍCH DỮ LIỆU CUỐI CHƯƠNG</div>
-        <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 10px;">Mỗi khi đọc xong, hệ thống sẽ mở khóa khả năng lục lọi bảo vật hoặc trang bị ngẫu nhiên.</p>
+        <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 10px;">Đọc xong chương, hãy lục lọi bảo vật hoặc trang bị ngẫu nhiên.</p>
         <button class="btn btn-primary" onclick="rollLootDrop()">🎲 Lục Lọi Bảo Vật Ngay</button>
       </div>
 
@@ -584,7 +732,6 @@
         <span>SYSTEM_V2.6 ⚡</span>
       </div>
 
-      <!-- TRANG CHỦ PHONE -->
       <div id="phone-home-screen">
         <div class="phone-widgets">
           <div class="widget-level" id="phone-level-display">LV.1 - Kẻ Lang Bạt</div>
@@ -647,7 +794,7 @@
         <button class="btn" style="width: 100%; font-size: 11px;" onclick="changeAuthorName()">Đổi Bút Danh</button>
       </div>
 
-      <!-- APP: KHO ĐỒ (PHÂN LOẠI & PHẨM CẤP) -->
+      <!-- APP: KHO ĐỒ -->
       <div class="phone-sub-app" id="phone-app-inventory">
         <div class="phone-app-header">
           <button class="phone-back-btn" onclick="phoneHome()">‹</button>
@@ -669,12 +816,20 @@
         <div class="phone-app-header">
           <button class="phone-back-btn" onclick="phoneHome()">‹</button>
           <span>Nhiệm Vụ Hệ Thống</span>
-          <span></span>
+          <button class="btn" style="padding: 2px 6px; font-size: 9px;" onclick="refreshDailyQuests()">🔄 Làm mới</button>
         </div>
+        
+        <div style="display:flex; gap:4px; margin-bottom:10px;">
+          <button class="filter-btn active" onclick="filterQuestTab('ALL', this)">Tất cả</button>
+          <button class="filter-btn" onclick="filterQuestTab('DAILY', this)">Hàng ngày</button>
+          <button class="filter-btn" onclick="filterQuestTab('MAIN', this)">Chính tuyến</button>
+          <button class="filter-btn" onclick="filterQuestTab('HIDDEN', this)">Ẩn</button>
+        </div>
+
         <div id="quests-container"></div>
       </div>
 
-      <!-- APP: CỬA HÀNG ĐỔI QUÀ -->
+      <!-- APP: CỬA HÀNG -->
       <div class="phone-sub-app" id="phone-app-shop">
         <div class="phone-app-header">
           <button class="phone-back-btn" onclick="phoneHome()">‹</button>
@@ -759,8 +914,8 @@
         <input type="hidden" id="story-modal-cover-base64">
       </div>
       <div class="modal-field">
-        <label>Thể loại / Tags:</label>
-        <input type="text" id="story-modal-genre" placeholder="Vô hạn lưu, Hệ thống, Glitch...">
+        <label>Thể loại / Tags (Ngăn cách bằng dấu phẩy):</label>
+        <input type="text" id="story-modal-genre" placeholder="Vô hạn lưu, Hệ thống, Glitch, Kinh dị, Xuyên không...">
       </div>
       <div class="modal-field">
         <label>Trạng thái:</label>
@@ -840,7 +995,6 @@
   </div>
 
   <script>
-    // CẤU HÌNH FIREBASE CỦA BẠN
     const firebaseConfig = {
       apiKey: "AIzaSyCzZF18xI8nM1TLqR1q3x7HxZYE-0_VMtk",
       authDomain: "truyendienvl.firebaseapp.com",
@@ -855,56 +1009,64 @@
     const db = firebase.firestore();
     const docRef = db.collection("studio_data").doc("main_library");
 
-    // ==========================================
-    // CƠ SỞ DỮ LIỆU BẢO VẬT PHÂN CẤP TỪ F ĐẾN SSS
-    // ==========================================
+    // ÂM THANH SYSTEM (Web Audio Synth)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq, duration, type = 'sine') {
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    function playSystemSound() {
+      playTone(523.25, 0.08, 'triangle');
+      setTimeout(() => playTone(659.25, 0.08, 'triangle'), 80);
+      setTimeout(() => playTone(783.99, 0.15, 'sine'), 160);
+    }
+
+    function showSystemAlert(title, message) {
+      playSystemSound();
+      const banner = document.getElementById('system-alert-banner');
+      document.getElementById('sys-alert-title').textContent = title;
+      document.getElementById('sys-alert-body').textContent = message;
+      banner.style.display = 'block';
+      setTimeout(() => { banner.style.display = 'none'; }, 3200);
+    }
+
+    // DANH MỤC BẢO VẬT TỔNG
     const MASTER_LOOT_TABLE = [
-      // HẠNG F (Rác / Vật cũ)
       { id: "f1", name: "Mẩu Bánh Mì Mốc", rank: "F", type: "FOOD", icon: "🍞", desc: "Khô khốc, nhưng có thể chống đói lúc tuyệt vọng." },
       { id: "f2", name: "Chai Nước Suối Dở", rank: "F", type: "FOOD", icon: "🧴", desc: "Còn sót lại vài giọt nước khoáng ấm." },
       { id: "f3", name: "Bao Diêm Ướt Nước", rank: "F", type: "ITEM", icon: "🪵", desc: "Kỷ vật từ một đêm mưa gió ở Thượng Hải." },
-
-      // HẠNG E (Đồ dùng thường ngày)
       { id: "e1", name: "Mì Tôm Cay Dung Thành", rank: "E", type: "FOOD", icon: "🍜", desc: "Món ăn rẻ tiền quen thuộc thời còn ở phòng net." },
       { id: "e2", name: "Lon Cà Phê Đen", rank: "E", type: "FOOD", icon: "☕", desc: "Giúp đầu óc tỉnh táo giữa các luồng dữ liệu rối loạn." },
       { id: "e3", name: "Dao Gọt Trái Cây Cũ", rank: "E", type: "WEAPON", icon: "🔪", desc: "Vũ khí thô sơ nhất để tự vệ trước dị thể cấp thấp." },
-
-      // HẠNG D (Sinh tồn cơ bản)
       { id: "d1", name: "Hộp Bò Hầm Quân Dụng", rank: "D", type: "FOOD", icon: "🥫", desc: "Bổ sung lượng calo lớn trong các phó bản kéo dài." },
       { id: "d2", name: "Bật Lửa Kim Loại Zippo", rank: "D", type: "ITEM", icon: "🔥", desc: "Tia lửa ấm áp xua tan cái lạnh không gian trắng." },
       { id: "d3", name: "Gậy Bóng Chày Gia Cố", rank: "D", type: "WEAPON", icon: "🏏", desc: "Bọc dây kẽm gai ở đầu, sức công phá ổn định." },
-
-      // HẠNG C (Vũ khí quân dụng nhẹ)
       { id: "c1", name: "Dao Găm Quân Đội M9", rank: "C", type: "WEAPON", icon: "🗡️", desc: "Lưỡi thép đen bén ngọt, thiết kế chuẩn cận chiến." },
       { id: "c2", name: "Súng Lục Bán Tự Động", rank: "C", type: "WEAPON", icon: "🔫", desc: "Uy lực tầm gần, phát ra âm thanh khô khốc." },
       { id: "c3", name: "Bộ Sơ Cứu Khẩn Cấp", rank: "C", type: "ITEM", icon: "🩹", desc: "Gạc vô trùng và cồn đỏ khử khuẩn vết thương." },
-
-      // HẠNG B (Chiến đấu nâng cao)
       { id: "b1", name: "Súng Trường Tấn Công", rank: "B", type: "WEAPON", icon: "⚡", desc: "Băng đạn 30 viên, uy lực quét sạch đàn quái cấp thấp." },
       { id: "b2", name: "Kiếm Katana Thép Đen", rank: "B", type: "WEAPON", icon: "⚔️", desc: "Rèn từ quặng thép đặc biệt, chém đứt kim loại mỏng." },
       { id: "b3", name: "Khẩu Phần Ăn Sinh Lực", rank: "B", type: "FOOD", icon: "🥩", desc: "Thịt hun khói cao cấp tẩm gia vị phục hồi thể lực." },
-
-      // HẠNG A (Bảo vật đặc biệt)
       { id: "a1", name: "Huyết Thanh Thể Phách", rank: "A", type: "FOOD", icon: "🧪", desc: "Tăng cường độ phản xạ và cảm tri thực tại." },
       { id: "a2", name: "Kiếm Gãy Thanh Sương", rank: "A", type: "WEAPON", icon: "🗡️", desc: "Cổ vật mang tàn dư kiếm khí, dù gãy vẫn sắc bén." },
-      { id: "a3", name: "Áo Giáp Nano Tàng Hình", rank: "A", type: "ITEM", icon: "🦺", desc: "Hấp thụ lực va đập và làm mờ hình bóng 3 giây." },
-
-      // HẠNG S (Vũ khí & Dị vật không gian)
       { id: "s1", name: "Súng Bắn Tỉa Phân Rã", rank: "S", type: "WEAPON", icon: "🔭", desc: "Bắn ra chùm hạt làm tan rã cấu trúc vật chất." },
       { id: "s2", name: "Lưỡi Hái Kẻ Lang Bạt", rank: "S", type: "WEAPON", icon: "💀", desc: "Cắt đứt sợi dây liên kết giữa linh hồn và phó bản." },
-      { id: "s3", name: "Viên Nang Đóng Băng", rank: "S", type: "ITEM", icon: "❄️", desc: "Ngưng đọng thời gian xung quanh trong chớp mắt." },
-
-      // HẠNG SS (Cổ vật quy tắc hệ thống)
       { id: "ss1", name: "Trái Tim Lõi Dung Thành", rank: "SS", type: "ITEM", icon: "💎", desc: "Mảnh vụn ký ức chứa nguồn năng lượng vô tận." },
-      { id: "ss2", name: "Kính Mắt Chiều Ký Tự", rank: "SS", type: "ITEM", icon: "👓", desc: "Nhìn thấu mọi dòng mã lập trình ẩn sau phó bản." },
-      { id: "ss3", name: "Thanh Kiếm Xé Rách Thực Tại", rank: "SS", type: "WEAPON", icon: "🌟", desc: "Chém rách bức tường không gian để thoát hiểm." },
-
-      // HẠNG SSS (Quyền năng máy chủ tối thượng)
-      { id: "sss1", name: "Mã Nguồn SYS_ERR_0x000F89", rank: "SSS", type: "ITEM", icon: "🌌", desc: "Quyền năng tối cao thao túng quy tắc vũ trụ DUDU." },
-      { id: "sss2", name: "Vương Miện Người Tạo Lập", rank: "SSS", type: "ITEM", icon: "👑", desc: "Biểu tượng của đấng sáng thế viết nên muôn ngàn câu chuyện." }
+      { id: "sss1", name: "Mã Nguồn SYS_ERR_0x000F89", rank: "SSS", type: "ITEM", icon: "🌌", desc: "Quyền năng tối cao thao túng quy tắc vũ trụ DUDU." }
     ];
 
-    // CỬA HÀNG ĐỔI BẰNG XU
     const SHOP_CATALOG = [
       { id: "shop-food-1", name: "Lon Cà Phê Phòng Net", rank: "E", price: 10, icon: "☕", type: "FOOD", desc: "Hồi phục tinh thần đọc truyện." },
       { id: "shop-food-2", name: "Hộp Bò Hầm Quân Dụng", rank: "D", price: 25, icon: "🥫", type: "FOOD", desc: "Lương khô sinh tồn cao cấp." },
@@ -914,7 +1076,15 @@
       { id: "shop-sss", name: "Mảnh Vỡ Quy Tắc 0x000F89", rank: "SSS", price: 300, icon: "🌌", type: "ITEM", desc: "Vật phẩm tối thượng của hệ thống." }
     ];
 
-    // DỮ LIỆU GỐC TRUYỆN ĐIÊN VL
+    const DEFAULT_SYSTEM_QUESTS = [
+      { id: "q_daily_read", type: "DAILY", title: "Duyệt Đọc Luồng Dữ Liệu", desc: "Đọc tích lũy 2 chương truyện bất kỳ.", current: 0, target: 2, rewardExp: 30, rewardCoin: 25, claimed: false },
+      { id: "q_daily_loot", type: "DAILY", title: "Thu Thập Tàn Tích", desc: "Thực hiện lục lọi hoặc nhặt trang bị 2 lần.", current: 0, target: 2, rewardExp: 25, rewardCoin: 20, claimed: false },
+      { id: "q_main_intro", type: "MAIN", title: "[Chính Tuyến] Bước Chân Vào Không Gian Trắng", desc: "Đọc trọn vẹn Chương 1 của truyện điên vl.", current: 0, target: 1, rewardExp: 50, rewardCoin: 50, claimed: false },
+      { id: "q_main_write", type: "MAIN", title: "[Chính Tuyến] Thiết Lập Bản Đồ Thế Giới", desc: "Tự tạo hoặc sửa thêm 1 chương truyện mới.", current: 0, target: 1, rewardExp: 60, rewardCoin: 60, claimed: false },
+      { id: "q_hidden_glitch", type: "HIDDEN", title: "[Nhiệm Vụ Ẩn] Khởi Động Mã Lệnh Lỗi", desc: "Chạm vào mã glitch SYS_ERR_0x000F89.", current: 0, target: 1, rewardExp: 80, rewardCoin: 100, claimed: false },
+      { id: "q_hidden_codex", type: "HIDDEN", title: "[Nhiệm Vụ Ẩn] Ký Ức Cố Nhân", desc: "Tra cứu hồ sơ Ôn Tri Hành hoặc Tô Thanh Lạc.", current: 0, target: 1, rewardExp: 50, rewardCoin: 40, claimed: false }
+    ];
+
     const initialNovels = [
       {
         id: "truyen-dien-vl",
@@ -924,6 +1094,7 @@
         status: "Đang ra",
         desc: "Linh hồn lang bạt rơi vào khoảng không vô tận của một hệ thống trục trặc.",
         coverImage: "",
+        updatedAt: "2026-10-09",
         introData: {
           title: "VĂN ÁN // GLITCH RECORD",
           code: "SYS_ERR_0x000F89",
@@ -955,20 +1126,23 @@
       title: "Thực Thể Ký Tự",
       exp: 40,
       level: 1,
-      currency: 50, // Xu Ký Tự
+      currency: 50,
       role: "admin",
       inventory: [
         { id: "init-1", name: "Mẩu Bánh Mì Mốc", rank: "F", type: "FOOD", icon: "🍞", desc: "Khô khốc, nhưng có thể chống đói lúc tuyệt vọng." },
         { id: "init-2", name: "Dao Gọt Trái Cây Cũ", rank: "E", type: "WEAPON", icon: "🔪", desc: "Vũ khí thô sơ nhất để tự vệ." }
       ],
-      quests: [
-        { id: "q1", title: "Thực Hiện Hành Trình", desc: "Đọc 1 chương truyện bất kỳ", rewardExp: 15, rewardCoin: 15, done: false },
-        { id: "q2", title: "Giải Mã Văn Án", desc: "Chạm vào dòng mã lỗi glitch trên văn án", rewardExp: 20, rewardCoin: 20, done: false },
-        { id: "q3", title: "Nhà Sáng Tạo", desc: "Viết thêm hoặc sửa 1 chương truyện", rewardExp: 35, rewardCoin: 30, done: false }
-      ]
+      quests: DEFAULT_SYSTEM_QUESTS
     };
 
-    novels.forEach(n => { if (!n.characters) n.characters = []; });
+    if (!userProfile.quests || !Array.isArray(userProfile.quests)) {
+      userProfile.quests = DEFAULT_SYSTEM_QUESTS;
+    }
+
+    novels.forEach(n => {
+      if (!n.characters) n.characters = [];
+      if (!n.updatedAt) n.updatedAt = "2026-10-09";
+    });
 
     let selectedNovelIndex = 0;
     let selectedChapterIndex = 0;
@@ -976,11 +1150,17 @@
     let editingChapterIndex = null;
     let editingCharIndex = null;
     let isReversedOrder = false;
-    let currentFilter = "ALL";
+    
+    // BIẾN QUẢN LÝ BỘ LỌC TÌM KIẾM
+    let currentFilterStatus = "ALL";
+    let selectedTag = "ALL";
+    let searchQuery = "";
+    let sortMode = "NEWEST_UPDATE";
+
     let inventoryTab = "ALL";
+    let questTab = "ALL";
     let isZen = false;
 
-    // PHÂN QUYỀN ADMIN / ĐỘC GIẢ
     function applyUserRole() {
       const btn = document.getElementById('role-toggle-btn');
       if (userProfile.role === 'admin') {
@@ -1000,7 +1180,6 @@
       saveDB();
     }
 
-    // LƯU & ĐỒNG BỘ ĐÁM MÂY
     function saveDB() {
       localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
       localStorage.setItem('my_cyber_profile', JSON.stringify(userProfile));
@@ -1028,11 +1207,15 @@
         const data = doc.data();
         if (data.novels && Array.isArray(data.novels) && data.novels.length > 0) {
           novels = data.novels;
-          novels.forEach(n => { if (!n.characters) n.characters = []; });
+          novels.forEach(n => {
+            if (!n.characters) n.characters = [];
+            if (!n.updatedAt) n.updatedAt = "2026-10-09";
+          });
           if (data.userProfile) {
             const curRole = userProfile.role;
             userProfile = data.userProfile;
             userProfile.role = curRole;
+            if (!userProfile.quests) userProfile.quests = DEFAULT_SYSTEM_QUESTS;
           }
           localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
           localStorage.setItem('my_cyber_profile', JSON.stringify(userProfile));
@@ -1048,7 +1231,47 @@
       renderHome();
     });
 
-    // HỆ THỐNG NHẶT ĐỒ RANDOM (LOOT DROP)
+    // TIẾN TRÌNH NHIỆM VỤ
+    function advanceQuest(questId, amount = 1) {
+      const q = userProfile.quests.find(item => item.id === questId);
+      if (q && !q.claimed) {
+        q.current = Math.min(q.target, q.current + amount);
+        if (q.current >= q.target) {
+          showSystemAlert("ĐINH! NHIỆM VỤ HOÀN TẤT", `Nhiệm vụ: "${q.title}" đã sẵn sàng nhận thưởng!`);
+        }
+        saveDB();
+        renderQuests();
+      }
+    }
+
+    function claimQuestReward(questId) {
+      const q = userProfile.quests.find(item => item.id === questId);
+      if (q && q.current >= q.target && !q.claimed) {
+        q.claimed = true;
+        userProfile.currency += q.rewardCoin;
+        addExp(q.rewardExp);
+        showSystemAlert("NHẬN THƯỞNG THÀNH CÔNG", `+${q.rewardExp} EXP | +${q.rewardCoin} Xu Ký Tự 🪙`);
+        saveDB();
+        renderQuests();
+      }
+    }
+
+    function refreshDailyQuests() {
+      userProfile.quests.forEach(q => {
+        if (q.type === 'DAILY') {
+          q.current = 0;
+          q.claimed = false;
+        }
+      });
+      showSystemAlert("HỆ THỐNG ĐÃ LÀM MỚI", "Toàn bộ nhiệm vụ hàng ngày đã được đặt lại!");
+      saveDB();
+      renderQuests();
+    }
+
+    function triggerEasterEgg() {
+      advanceQuest('q_hidden_glitch', 1);
+    }
+
     function rollLootDrop() {
       const roll = Math.random() * 100;
       let targetRanks = [];
@@ -1064,15 +1287,14 @@
       const pool = MASTER_LOOT_TABLE.filter(item => targetRanks.includes(item.rank));
       const picked = pool[Math.floor(Math.random() * pool.length)] || MASTER_LOOT_TABLE[0];
 
-      // Thưởng xu ngẫu nhiên
       const bonusCoins = Math.floor(Math.random() * 10) + 5;
       userProfile.currency += bonusCoins;
 
-      // Đưa vào hòm đồ
       userProfile.inventory.unshift({ ...picked, instanceId: "item-" + Date.now() });
       addExp(15);
+      advanceQuest('q_daily_loot', 1);
 
-      alert(`🎲 [HỆ THỐNG PHÁT HIỆN TÀN TÍCH]\n\nBạn nhặt được: [Hạng ${picked.rank}] ${picked.name} ${picked.icon}\nPhân loại: ${picked.type === 'FOOD' ? 'Đồ ăn' : (picked.type === 'WEAPON' ? 'Vũ khí' : 'Vật phẩm')}\nNhận kèm: +${bonusCoins} Xu Ký Tự 🪙\n\n${picked.desc}`);
+      showSystemAlert("TÀN TÍCH DỮ LIỆU", `Nhặt được: [${picked.rank}] ${picked.name} (+${bonusCoins} Xu)`);
       saveDB();
       renderInventory();
     }
@@ -1084,24 +1306,9 @@
         userProfile.exp -= expNeeded;
         userProfile.level += 1;
         userProfile.currency += 30;
-        alert(`🎉 Thăng cấp! Bạn đã đạt LEVEL ${userProfile.level} và nhận 30 Xu Ký Tự!`);
+        showSystemAlert("THĂNG CẤP THỰC THỂ!", `Đạt LEVEL ${userProfile.level} (+30 Xu Thưởng)`);
       }
       saveDB();
-    }
-
-    function completeQuest(questId) {
-      const q = userProfile.quests.find(item => item.id === questId);
-      if (q && !q.done) {
-        q.done = true;
-        userProfile.currency += q.rewardCoin;
-        addExp(q.rewardExp);
-        alert(`✨ Hoàn thành nhiệm vụ: "${q.title}"!\n+${q.rewardExp} EXP | +${q.rewardCoin} Xu Ký Tự 🪙`);
-        saveDB();
-      }
-    }
-
-    function triggerEasterEgg() {
-      completeQuest('q2');
     }
 
     function countWords(str) {
@@ -1112,7 +1319,14 @@
       return (novel.chapters || []).reduce((acc, ch) => acc + (ch.wordCount || countWords(ch.content)), 0);
     }
 
-    // TẢI ẢNH BÌA
+    function getNovelLatestDate(novel) {
+      if (novel.chapters && novel.chapters.length > 0) {
+        const lastCh = novel.chapters[novel.chapters.length - 1];
+        return lastCh.updatedAt || lastCh.createdAt || novel.updatedAt || "2026-10-09";
+      }
+      return novel.updatedAt || "2026-10-09";
+    }
+
     function handleCoverFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1123,21 +1337,123 @@
       reader.readAsDataURL(file);
     }
 
-    // TỦ TRUYỆN
+    // ==========================================
+    // LOGIC TÌM KIẾM, LỌC THEO TAG & SẮP XẾP THỜI GIAN
+    // ==========================================
+    function onSearchChange() {
+      searchQuery = document.getElementById('search-novel-input').value.trim().toLowerCase();
+      renderHome();
+    }
+
+    function onSortChange() {
+      sortMode = document.getElementById('sort-select-ctrl').value;
+      renderHome();
+    }
+
+    function filterStatus(status, btn) {
+      currentFilterStatus = status;
+      document.querySelectorAll('.filter-status-row .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderHome();
+    }
+
+    function selectTagFilter(tag, element) {
+      selectedTag = tag;
+      document.querySelectorAll('#tag-cloud-container .tag-chip').forEach(el => el.classList.remove('active'));
+      element.classList.add('active');
+      renderHome();
+    }
+
+    function renderTagCloud() {
+      const container = document.getElementById('tag-cloud-container');
+      const allTags = new Set();
+      allTags.add("Tất cả");
+
+      novels.forEach(n => {
+        if (n.genre) {
+          n.genre.split(/[,/]+/).forEach(g => {
+            const trimmed = g.trim();
+            if (trimmed) allTags.add(trimmed);
+          });
+        }
+      });
+
+      container.innerHTML = "";
+      allTags.forEach(tag => {
+        const span = document.createElement('span');
+        span.className = `tag-chip ${(selectedTag === tag || (selectedTag === 'ALL' && tag === 'Tất cả')) ? 'active' : ''}`;
+        span.textContent = tag;
+        span.onclick = () => selectTagFilter(tag === 'Tất cả' ? 'ALL' : tag, span);
+        container.appendChild(span);
+      });
+    }
+
+    // TỦ TRUYỆN HIỂN THỊ DỮ LIỆU
     function renderHome() {
+      renderTagCloud();
+
       const container = document.getElementById('novel-grid-container');
       container.innerHTML = "";
 
-      const filtered = novels.filter(n => currentFilter === "ALL" || n.status === currentFilter);
+      // 1. Lọc theo trạng thái
+      let filtered = novels.filter(n => currentFilterStatus === "ALL" || n.status === currentFilterStatus);
+
+      // 2. Lọc theo tag
+      if (selectedTag !== "ALL") {
+        filtered = filtered.filter(n => {
+          if (!n.genre) return false;
+          const tags = n.genre.split(/[,/]+/).map(t => t.trim().toLowerCase());
+          return tags.includes(selectedTag.toLowerCase());
+        });
+      }
+
+      // 3. Lọc theo từ khóa tìm kiếm (Tên truyện, tóm tắt, tên nhân vật)
+      if (searchQuery) {
+        filtered = filtered.filter(n => {
+          const matchTitle = (n.title || "").toLowerCase().includes(searchQuery);
+          const matchDesc = (n.desc || "").toLowerCase().includes(searchQuery);
+          const matchChar = (n.characters || []).some(c => (c.name || "").toLowerCase().includes(searchQuery));
+          return matchTitle || matchDesc || matchChar;
+        });
+      }
+
+      // 4. Sắp xếp theo chế độ được chọn
+      filtered.sort((a, b) => {
+        const dateA = new Date(getNovelLatestDate(a)).getTime() || 0;
+        const dateB = new Date(getNovelLatestDate(b)).getTime() || 0;
+
+        if (sortMode === 'NEWEST_UPDATE') return dateB - dateA;
+        if (sortMode === 'OLDEST_UPDATE') return dateA - dateB;
+        if (sortMode === 'MOST_CHAPTERS') return (b.chapters ? b.chapters.length : 0) - (a.chapters ? a.chapters.length : 0);
+        if (sortMode === 'MOST_WORDS') return getNovelTotalWords(b) - getNovelTotalWords(a);
+        return 0;
+      });
+
+      document.getElementById('search-result-count').textContent = `Hiển thị ${filtered.length} / ${novels.length} truyện`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 40px 10px; color: var(--text-dim);">
+            <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
+            <div>Không tìm thấy tác phẩm nào phù hợp với bộ lọc hiện tại.</div>
+            <button class="btn" style="margin-top: 12px;" onclick="resetAllFilters()">Đặt lại bộ lọc</button>
+          </div>
+        `;
+        return;
+      }
 
       filtered.forEach((novel) => {
         const originalIndex = novels.indexOf(novel);
         const totalWords = getNovelTotalWords(novel);
+        const latestDate = getNovelLatestDate(novel);
         const card = document.createElement('div');
         card.className = 'novel-card';
         card.onclick = () => openCover(originalIndex);
 
         const coverBg = novel.coverImage ? `background-image: url('${novel.coverImage}');` : '';
+
+        // Tách các tag hiển thị thành từng ô badge nhỏ
+        const tagBadgesHtml = (novel.genre || "Tiểu thuyết").split(/[,/]+/).map(t => `<span class="tag">${escapeHtml(t.trim())}</span>`).join(" ");
 
         card.innerHTML = `
           <div class="novel-cover" style="${coverBg}">
@@ -1151,31 +1467,37 @@
             <div>
               <div class="novel-badges">
                 <span class="tag tag-status">${escapeHtml(novel.status || "Đang ra")}</span>
-                <span class="tag">${escapeHtml(novel.genre || "Tiểu thuyết")}</span>
+                ${tagBadgesHtml}
               </div>
               <div class="novel-title">${escapeHtml(novel.title)}</div>
               <div class="novel-desc">${escapeHtml(novel.desc || novel.title)}</div>
             </div>
             <div class="novel-meta">
-              <span>Tác giả: ${escapeHtml(novel.author || userProfile.name)}</span>
+              <span style="color:var(--text-dim)">⏱ Cập nhật: <b>${latestDate}</b></span>
               <span>Đọc ngay ➔</span>
             </div>
           </div>
         `;
         container.appendChild(card);
       });
+
       applyUserRole();
       updatePhoneUI();
     }
 
-    function filterStatus(status, btn) {
-      currentFilter = status;
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+    function resetAllFilters() {
+      searchQuery = "";
+      selectedTag = "ALL";
+      currentFilterStatus = "ALL";
+      sortMode = "NEWEST_UPDATE";
+      document.getElementById('search-novel-input').value = "";
+      document.getElementById('sort-select-ctrl').value = "NEWEST_UPDATE";
+      document.querySelectorAll('.filter-status-row .filter-btn').forEach((b, idx) => {
+        b.classList.toggle('active', idx === 0);
+      });
       renderHome();
     }
 
-    // TRANG BÌA & MỤC LỤC
     function openCover(idx) {
       selectedNovelIndex = idx;
       const novel = novels[idx];
@@ -1205,7 +1527,6 @@
       document.getElementById('intro-box-code').textContent = intro.code || "SYS_INITIALIZED";
       document.getElementById('book-intro').textContent = intro.text || novel.intro || "[ Không có dữ liệu văn án ]";
 
-      // Đọc tiếp chương cuối cùng
       const bookmark = JSON.parse(localStorage.getItem(`bookmark_${novel.id}`));
       const resumeBtn = document.getElementById('btn-resume-reading');
       const lastIndex = novel.chapters ? novel.chapters.length - 1 : -1;
@@ -1274,7 +1595,6 @@
       }
     }
 
-    // TRÌNH ĐỌC TRUYỆN
     function readChapter(chIdx, scrollPos = 0) {
       selectedChapterIndex = chIdx;
       const novel = novels[selectedNovelIndex];
@@ -1311,7 +1631,8 @@
       document.getElementById('btn-next-ch').style.visibility = (chIdx < novel.chapters.length - 1) ? 'visible' : 'hidden';
 
       addExp(5);
-      completeQuest('q1');
+      advanceQuest('q_daily_read', 1);
+      if (chIdx === 0) advanceQuest('q_main_intro', 1);
 
       setTimeout(() => {
         window.scrollTo({ top: scrollPos, behavior: scrollPos ? 'smooth' : 'auto' });
@@ -1346,7 +1667,6 @@
       }
     });
 
-    // PHÍM TẮT
     window.addEventListener('keydown', (e) => {
       if (document.getElementById('reader-view').style.display === 'block') {
         if (e.key === 'ArrowLeft') prevChapter();
@@ -1424,6 +1744,7 @@
       const status = document.getElementById('story-modal-status').value;
       const desc = document.getElementById('story-modal-desc').value.trim();
       const introText = document.getElementById('story-modal-intro').value.trim();
+      const nowStr = new Date().toISOString().slice(0, 10);
 
       if (!title) { alert("Vui lòng nhập tên truyện!"); return; }
 
@@ -1434,6 +1755,7 @@
         cur.genre = genre;
         cur.status = status;
         cur.desc = desc;
+        cur.updatedAt = nowStr;
         cur.introData = {
           title: "VĂN ÁN // GLITCH RECORD",
           code: "SYS_UPDATED",
@@ -1451,6 +1773,7 @@
           status,
           desc,
           coverImage: coverImage || "",
+          updatedAt: nowStr,
           introData: {
             title: "VĂN ÁN // GLITCH RECORD",
             code: "SYS_ERR_0x000F89",
@@ -1460,6 +1783,7 @@
           chapters: []
         });
         addExp(25);
+        advanceQuest('q_main_write', 1);
         saveDB();
         closeModals();
         renderHome();
@@ -1517,6 +1841,9 @@
       const wordCount = countWords(content);
       const nowStr = new Date().toISOString().slice(0, 10);
 
+      // Cập nhật ngày sửa cho cả truyện
+      novels[selectedNovelIndex].updatedAt = nowStr;
+
       if (editingChapterIndex !== null) {
         const ch = novels[selectedNovelIndex].chapters[editingChapterIndex];
         ch.title = title;
@@ -1543,7 +1870,7 @@
           authorNote
         });
         addExp(35);
-        completeQuest('q3');
+        advanceQuest('q_main_write', 1);
         localStorage.removeItem('my_auto_draft');
         saveDB();
         closeModals();
@@ -1559,7 +1886,6 @@
       }
     }
 
-    // SỔ TAY NHÂN VẬT
     function getSelectedCodexNovel() {
       const selector = document.getElementById('codex-novel-selector');
       const novelId = selector.value;
@@ -1582,6 +1908,8 @@
       const novel = getSelectedCodexNovel();
       const container = document.getElementById('codex-container');
       container.innerHTML = "";
+
+      advanceQuest('q_hidden_codex', 1);
 
       if (!novel || !novel.characters || novel.characters.length === 0) {
         container.innerHTML = `<div style="text-align:center; padding: 20px 10px; color: #64748b; font-size: 11px;">Chưa có nhân vật nào.<br>Bấm "+ Thêm" để tạo hồ sơ!</div>`;
@@ -1683,7 +2011,6 @@
       if (isZen) toggleZenMode();
     }
 
-    // CYBER PHONE & MINIGAME
     function togglePhone() {
       const phone = document.getElementById('cyber-phone');
       phone.style.display = (phone.style.display === 'flex') ? 'none' : 'flex';
@@ -1757,20 +2084,56 @@
       renderInventory();
     }
 
+    function filterQuestTab(tab, btn) {
+      questTab = tab;
+      document.querySelectorAll('#phone-app-quests .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderQuests();
+    }
+
     function renderQuests() {
       const container = document.getElementById('quests-container');
       container.innerHTML = "";
-      userProfile.quests.forEach(q => {
+
+      let list = userProfile.quests || [];
+      if (questTab !== 'ALL') {
+        list = list.filter(q => q.type === questTab);
+      }
+
+      if (list.length === 0) {
+        container.innerHTML = `<div style="text-align:center; color:#64748b; font-size:11px; padding:20px;">Không có nhiệm vụ ở danh mục này.</div>`;
+        return;
+      }
+
+      list.forEach(q => {
+        const isReady = q.current >= q.target && !q.claimed;
+        const percent = Math.min(100, Math.round((q.current / q.target) * 100));
+
         const div = document.createElement('div');
-        div.className = 'quest-card';
+        div.className = `quest-card ${isReady ? 'ready-claim' : ''} ${q.claimed ? 'completed' : ''}`;
+
+        let actionBtnHtml = '';
+        if (q.claimed) {
+          actionBtnHtml = `<span style="font-size:11px; color:#10b981; font-weight:bold;">✔ Đã nhận thưởng</span>`;
+        } else if (isReady) {
+          actionBtnHtml = `<button class="btn btn-primary" style="padding:4px 8px; font-size:10px; background:var(--gold); border-color:var(--gold); color:#000; font-weight:bold;" onclick="claimQuestReward('${q.id}')">🎁 Nhận Thưởng</button>`;
+        } else {
+          actionBtnHtml = `<span style="font-size:10px; color:#94a3b8;">Đang tiến hành (${q.current}/${q.target})</span>`;
+        }
+
         div.innerHTML = `
-          <div style="font-size:20px;">${q.done ? '✅' : '📌'}</div>
-          <div style="flex:1;">
-            <div style="font-size:12px; font-weight:bold; color:${q.done ? 'var(--neon)' : '#cbd5e1'};">${escapeHtml(q.title)}</div>
-            <div style="font-size:10px; color:#94a3b8;">${escapeHtml(q.desc)}</div>
-            <div style="font-size:9px; color:var(--gold); margin-top:2px;">Thưởng: +${q.rewardExp} EXP | +${q.rewardCoin} 🪙 Xu</div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="quest-type-tag quest-type-${q.type}">${q.type === 'MAIN' ? 'Chính tuyến' : (q.type === 'DAILY' ? 'Hàng ngày' : 'Nhiệm vụ ẩn')}</span>
+            <span style="font-size:10px; color:var(--gold); font-weight:bold;">+${q.rewardExp} EXP | +${q.rewardCoin} 🪙 Xu</span>
           </div>
-          <div style="font-size:10px; font-weight:bold; color:${q.done ? '#10b981' : '#64748b'};">${q.done ? 'Xong' : 'Chưa'}</div>
+          <div style="font-size:12px; font-weight:bold; color:var(--text-white); margin-top:2px;">${escapeHtml(q.title)}</div>
+          <div style="font-size:10px; color:#94a3b8; line-height:1.4;">${escapeHtml(q.desc)}</div>
+          <div class="quest-prog-bar">
+            <div class="quest-prog-fill" style="width: ${percent}%;"></div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:2px;">
+            ${actionBtnHtml}
+          </div>
         `;
         container.appendChild(div);
       });
@@ -1813,7 +2176,7 @@
       userProfile.inventory.unshift({ ...item, instanceId: "item-" + Date.now() });
       addExp(20);
 
-      alert(`🎉 Mua thành công: [Hạng ${item.rank}] ${item.name}!\nVật phẩm đã được cất vào Kho Đồ.`);
+      showSystemAlert("GIAO DỊCH THÀNH CÔNG", `Đã mua: [${item.rank}] ${item.name} (-${item.price} Xu)`);
       saveDB();
       renderShop();
     }
