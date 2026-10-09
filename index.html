@@ -728,7 +728,61 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const docRef = db.collection("studio_data").doc("main_library");
+// ==========================================
+    // CƠ CHẾ ĐỒNG BỘ FIREBASE AN TOÀN (CHỐNG MẤT DỮ LIỆU)
+    // ==========================================
+    let isCloudSynced = false;
 
+    function saveDB() {
+      // 1. Luôn bảo vệ dữ liệu cục bộ trước
+      localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
+      localStorage.setItem('my_cyber_profile', JSON.stringify(userProfile));
+      updatePhoneUI();
+
+      // 2. Gửi lên Firebase Cloud
+      const indicator = document.getElementById('cloud-indicator');
+      if (indicator) indicator.textContent = "☁️ Đang lưu...";
+
+      docRef.set({
+        novels: novels,
+        userProfile: userProfile,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true })
+      .then(() => {
+        if (indicator) indicator.textContent = "☁️ Đã lưu đám mây";
+      })
+      .catch((err) => {
+        console.warn("Lưu đám mây không thành công:", err);
+        if (indicator) indicator.textContent = "⚠️ Lưu offline";
+      });
+    }
+
+    // Lắng nghe dữ liệu đám mây an toàn
+    docRef.onSnapshot((doc) => {
+      const indicator = document.getElementById('cloud-indicator');
+      if (doc.exists) {
+        const data = doc.data();
+        // CHỈ GHI ĐÈ KHI TRÊN MÂY THỰC SỰ CÓ TRUYỆN HỢP LỆ
+        if (data.novels && Array.isArray(data.novels) && data.novels.length > 0) {
+          novels = data.novels;
+          novels.forEach(n => { if (!n.characters) n.characters = []; });
+          if (data.userProfile) userProfile = data.userProfile;
+          localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
+          localStorage.setItem('my_cyber_profile', JSON.stringify(userProfile));
+          renderHome();
+        }
+        if (indicator) indicator.textContent = "☁️ Đã kết nối đám mây";
+      } else {
+        // Nếu trên Firebase chưa có gì, chủ động đẩy dữ liệu hiện tại lên
+        saveDB();
+      }
+    }, (err) => {
+      console.warn("Chưa kích hoạt Rules Firestore:", err);
+      const indicator = document.getElementById('cloud-indicator');
+      if (indicator) indicator.textContent = "⚠️ Offline mode";
+      // Khi lỗi kết nối, giữ nguyên dữ liệu trên máy và render lại
+      renderHome();
+    });
     // WEB AUDIO SYNTH
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playBeep(freq = 440, duration = 0.05, type = 'sine') {
