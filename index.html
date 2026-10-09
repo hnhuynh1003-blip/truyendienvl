@@ -97,6 +97,16 @@
       gap: 4px;
     }
 
+    .user-info-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      color: var(--gold);
+      background: rgba(245, 158, 11, 0.1);
+      cursor: pointer;
+    }
+
     .role-badge {
       font-size: 11px;
       padding: 3px 8px;
@@ -291,19 +301,6 @@
       animation: alertSlide 0.3s ease;
     }
     @keyframes alertSlide { from { top: 30px; opacity: 0; } to { top: 60px; opacity: 1; } }
-
-    /* GLITCH EFFECT */
-    .glitch-text:hover {
-      animation: glitch-anim 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
-    }
-    @keyframes glitch-anim {
-      0% { transform: translate(0); }
-      20% { transform: translate(-2px, 1px); text-shadow: 2px 0 var(--red), -2px 0 var(--neon); }
-      40% { transform: translate(1px, -1px); text-shadow: -2px 0 var(--red), 2px 0 var(--neon); }
-      60% { transform: translate(-1px, 2px); text-shadow: 2px 0 var(--neon), -2px 0 var(--red); }
-      80% { transform: translate(2px, -1px); text-shadow: -2px 0 var(--neon), 2px 0 var(--red); }
-      100% { transform: translate(0); }
-    }
 
     /* DANH SÁCH TRUYỆN */
     .novel-grid {
@@ -598,7 +595,8 @@
       <span class="cloud-status" id="cloud-indicator">☁️ Đang kết nối...</span>
     </div>
     <div style="display: flex; align-items: center; gap: 8px;">
-      <span class="role-badge" id="role-toggle-btn" onclick="toggleUserRole()" title="Nhấn để đổi quyền Tác giả / Độc giả">👑 Tác Giả (Admin)</span>
+      <span class="user-info-badge" id="account-status-btn" onclick="openAuthModal()" title="Bấm để đăng nhập hoặc đổi tài khoản">👤 Khách</span>
+      <span class="role-badge" id="role-toggle-btn" onclick="toggleUserRole()" title="Nhấn để đổi quyền Tác giả / Độc giả">👑 Tác Giả</span>
       <button class="btn btn-primary admin-only" onclick="openStoryModal()">+ Tạo tác phẩm</button>
     </div>
   </header>
@@ -787,16 +785,17 @@
           <div style="font-size: 38px;">🧙‍♂️</div>
           <div style="font-weight: bold; color: var(--neon); font-size: 15px;" id="profile-name">Kẻ Lang Bạt</div>
           <div style="font-size: 11px; color: #64748b;" id="profile-title">Người Thao Túng Mã Nguồn</div>
+          <div style="font-size: 10px; color: var(--gold); margin-top: 4px;" id="profile-account-id">ID: Khách</div>
         </div>
         <div style="background: #1e293b; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 10px;">
           <div>📚 Số truyện: <b id="stat-novels" style="color:var(--neon)">1</b></div>
           <div style="margin-top: 4px;">📝 Tổng chương: <b id="stat-chapters" style="color:var(--neon)">1</b></div>
           <div style="margin-top: 4px;">🔤 Tổng từ đã viết: <b id="stat-total-words" style="color:var(--neon)">0</b></div>
         </div>
-        <button class="btn" style="width: 100%; font-size: 11px;" onclick="changeAuthorName()">Đổi Bút Danh</button>
+        <button class="btn" style="width: 100%; font-size: 11px;" onclick="openAuthModal()">Đổi Tài Khoản / Đăng Xuất</button>
       </div>
 
-      <!-- APP: KHO ĐỒ (KHÓA ĐẾM NGƯỢC THỜI GIAN THẬT) -->
+      <!-- APP: KHO ĐỒ -->
       <div class="phone-sub-app" id="phone-app-inventory">
         <div class="phone-app-header">
           <button class="phone-back-btn" onclick="phoneHome()">‹</button>
@@ -896,6 +895,28 @@
       </div>
 
       <div class="phone-home-bar" onclick="phoneHome()"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: ĐĂNG NHẬP / TẠO TÀI KHOẢN (ĐỘC LẬP THIẾT BỊ) -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal-card" style="max-width: 400px; text-align: center;">
+      <h2>🔑 ĐĂNG NHẬP HỆ THỐNG</h2>
+      <p style="font-size: 12px; color: var(--text-dim);">Tạo hoặc đăng nhập tài khoản riêng của thiết bị này để lưu Kho Đồ, Xu, Cấp Độ độc lập.</p>
+      
+      <div class="modal-field" style="text-align: left; margin-top: 10px;">
+        <label>Tên đăng nhập (ID người chơi):</label>
+        <input type="text" id="auth-username" placeholder="Ví dụ: dudu_phone hoặc reader_pc">
+      </div>
+      <div class="modal-field" style="text-align: left;">
+        <label>Mã PIN bảo mật (Tùy chọn):</label>
+        <input type="password" id="auth-pin" placeholder="Ví dụ: 1234">
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 14px;">
+        <button class="btn" style="flex:1" onclick="closeModals()">Đóng</button>
+        <button class="btn btn-primary" style="flex:1" onclick="handleAuthSubmit()">Vào Hệ Thống</button>
+      </div>
     </div>
   </div>
 
@@ -1124,8 +1145,12 @@
 
     let novels = JSON.parse(localStorage.getItem('my_novels_library_db')) || initialNovels;
 
-    // TÀI KHOẢN, KHO ĐỒ, CẤP BẬC LƯU RIÊNG TỪNG THIẾT BỊ (ĐỘC LẬP HOÀN TOÀN)
-    let userProfile = JSON.parse(localStorage.getItem('my_device_local_profile')) || {
+    // ==========================================
+    // CƠ CHẾ ĐĂNG NHẬP / PHÂN CHIA TÀI KHOẢN ĐỘC LẬP
+    // ==========================================
+    let currentUsername = localStorage.getItem('my_current_logged_user') || "";
+    let userProfile = {
+      username: "guest",
       name: "Kẻ Lang Bạt",
       title: "Thực Thể Ký Tự",
       exp: 40,
@@ -1139,8 +1164,96 @@
       quests: DEFAULT_SYSTEM_QUESTS
     };
 
-    if (!userProfile.quests || !Array.isArray(userProfile.quests)) {
-      userProfile.quests = DEFAULT_SYSTEM_QUESTS;
+    function loadLocalAccountProfile() {
+      if (!currentUsername) {
+        // Chưa đăng nhập: Mở pop-up để người dùng đăng nhập/tạo tài khoản
+        setTimeout(openAuthModal, 600);
+      } else {
+        const localKey = `profile_${currentUsername}`;
+        const saved = localStorage.getItem(localKey);
+        if (saved) {
+          userProfile = JSON.parse(saved);
+        }
+        document.getElementById('account-status-btn').textContent = `👤 ${currentUsername}`;
+        document.getElementById('profile-account-id').textContent = `ID: ${currentUsername}`;
+        
+        // Kéo dữ liệu của tài khoản này từ Firestore Cloud nếu có
+        db.collection("user_profiles").doc(currentUsername).get().then(doc => {
+          if (doc.exists) {
+            const cloudData = doc.data();
+            userProfile.level = Math.max(userProfile.level, cloudData.level || 1);
+            userProfile.exp = Math.max(userProfile.exp, cloudData.exp || 0);
+            userProfile.currency = Math.max(userProfile.currency, cloudData.currency || 0);
+            if (cloudData.inventory) userProfile.inventory = cloudData.inventory;
+            if (cloudData.quests) userProfile.quests = cloudData.quests;
+            saveCurrentAccount();
+          }
+        }).catch(err => console.log("Chưa có cloud profile:", err));
+      }
+      applyUserRole();
+      updatePhoneUI();
+    }
+
+    function saveCurrentAccount() {
+      if (currentUsername) {
+        const localKey = `profile_${currentUsername}`;
+        localStorage.setItem(localKey, JSON.stringify(userProfile));
+        
+        // Đồng bộ dữ liệu riêng của người dùng lên Cloud Firestore
+        db.collection("user_profiles").doc(currentUsername).set({
+          username: currentUsername,
+          name: userProfile.name,
+          title: userProfile.title,
+          level: userProfile.level,
+          exp: userProfile.exp,
+          currency: userProfile.currency,
+          inventory: userProfile.inventory,
+          quests: userProfile.quests,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }).catch(e => console.log("Lưu cloud user lỗi:", e));
+      }
+      updatePhoneUI();
+    }
+
+    function openAuthModal() {
+      document.getElementById('auth-username').value = currentUsername || '';
+      document.getElementById('auth-modal').style.display = 'flex';
+    }
+
+    function handleAuthSubmit() {
+      const usernameInput = document.getElementById('auth-username').value.trim().toLowerCase();
+      if (!usernameInput) {
+        alert("Vui lòng nhập tên tài khoản!");
+        return;
+      }
+
+      currentUsername = usernameInput;
+      localStorage.setItem('my_current_logged_user', currentUsername);
+      
+      const localKey = `profile_${currentUsername}`;
+      const saved = localStorage.getItem(localKey);
+      if (saved) {
+        userProfile = JSON.parse(saved);
+      } else {
+        // Tài khoản mới hoàn toàn
+        userProfile.username = currentUsername;
+        userProfile.name = currentUsername;
+        userProfile.level = 1;
+        userProfile.exp = 0;
+        userProfile.currency = 50;
+        userProfile.inventory = [
+          { id: "init-1", name: "Mẩu Bánh Mì Mốc", rank: "F", type: "FOOD", icon: "🍞", desc: "Khô khốc, nhưng có thể chống đói lúc tuyệt vọng." },
+          { id: "init-2", name: "Dao Gọt Trái Cây Cũ", rank: "E", type: "WEAPON", icon: "🔪", desc: "Vũ khí thô sơ nhất để tự vệ." }
+        ];
+        userProfile.quests = DEFAULT_SYSTEM_QUESTS;
+      }
+
+      saveCurrentAccount();
+      document.getElementById('account-status-btn').textContent = `👤 ${currentUsername}`;
+      document.getElementById('profile-account-id').textContent = `ID: ${currentUsername}`;
+      closeModals();
+      showSystemAlert("ĐĂNG NHẬP THÀNH CÔNG", `Chào mừng thực thể [${currentUsername}] vào hệ thống!`);
+      renderHome();
     }
 
     novels.forEach(n => {
@@ -1173,11 +1286,11 @@
       const btn = document.getElementById('role-toggle-btn');
       if (userProfile.role === 'admin') {
         document.body.classList.remove('is-reader');
-        btn.textContent = "👑 Tác Giả (Admin)";
+        btn.textContent = "👑 Tác Giả";
         btn.classList.remove('reader');
       } else {
         document.body.classList.add('is-reader');
-        btn.textContent = "📖 Độc Giả (Reader)";
+        btn.textContent = "📖 Độc Giả";
         btn.classList.add('reader');
       }
     }
@@ -1185,19 +1298,13 @@
     function toggleUserRole() {
       userProfile.role = (userProfile.role === 'admin') ? 'reader' : 'admin';
       applyUserRole();
-      saveLocalProfile();
+      saveCurrentAccount();
     }
 
-    // LƯU RIÊNG TÀI KHOẢN VÀ KHO ĐỒ CHO MỖI THIẾT BỊ
-    function saveLocalProfile() {
-      localStorage.setItem('my_device_local_profile', JSON.stringify(userProfile));
-      updatePhoneUI();
-    }
-
-    // ĐỒNG BỘ NỘI DUNG TRUYỆN LÊN FIREBASE (CHỈ ĐỒNG BỘ TRUYỆN)
+    // ĐỒNG BỘ TRUYỆN QUA FIREBASE
     function saveDB() {
       localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
-      saveLocalProfile();
+      saveCurrentAccount();
 
       const indicator = document.getElementById('cloud-indicator');
       if (indicator) indicator.textContent = "☁️ Đang lưu...";
@@ -1214,7 +1321,6 @@
       });
     }
 
-    // LẮNG NGHE ĐỒNG BỘ TRUYỆN (KHÔNG ĐÈ KHO ĐỒ HAY TÀI KHOẢN RIÊNG)
     docRef.onSnapshot((doc) => {
       const indicator = document.getElementById('cloud-indicator');
       if (doc.exists) {
@@ -1230,7 +1336,7 @@
 
         renderHome();
         updatePhoneUI();
-        if (indicator) indicator.textContent = "☁️ Đã đồng bộ truyện";
+        if (indicator) indicator.textContent = "☁️ Đã đồng bộ";
       } else {
         if (indicator) indicator.textContent = "☁️ Sẵn sàng";
       }
@@ -1305,7 +1411,7 @@
         showSystemAlert("THĂNG CẤP THỰC THỂ!", `Đạt LEVEL ${userProfile.level} (+30 Xu Thưởng)`);
       }
 
-      saveLocalProfile();
+      saveCurrentAccount();
     }
 
     function advanceQuest(questId, amount = 1) {
@@ -1315,7 +1421,7 @@
         if (q.current >= q.target) {
           showSystemAlert("ĐINH! NHIỆM VỤ HOÀN TẤT", `Nhiệm vụ: "${q.title}" đã sẵn sàng nhận thưởng!`);
         }
-        saveLocalProfile();
+        saveCurrentAccount();
         renderQuests();
       }
     }
@@ -1327,7 +1433,7 @@
         userProfile.currency += q.rewardCoin;
         addExp(q.rewardExp);
         showSystemAlert("NHẬN THƯỞNG THÀNH CÔNG", `+${q.rewardExp} EXP | +${q.rewardCoin} Xu Ký Tự 🪙`);
-        saveLocalProfile();
+        saveCurrentAccount();
         renderQuests();
       }
     }
@@ -1340,7 +1446,7 @@
         }
       });
       showSystemAlert("HỆ THỐNG ĐÃ LÀM MỚI", "Toàn bộ nhiệm vụ hàng ngày đã được đặt lại!");
-      saveLocalProfile();
+      saveCurrentAccount();
       renderQuests();
     }
 
@@ -1426,7 +1532,7 @@
         showSystemAlert("TÀN TÍCH DỮ LIỆU", `Nhặt được: [${picked.rank}] ${picked.name} (+${bonusCoins} Xu)`);
       }
 
-      saveLocalProfile();
+      saveCurrentAccount();
       renderInventory();
     }
 
@@ -1806,7 +1912,6 @@
         const scrolled = (winScroll / height) * 100;
         document.getElementById('reading-bar').style.width = scrolled + '%';
 
-        // Tự động hiện thanh nút nổi khi cuộn xuống quá 200px
         if (winScroll > 200) {
           floatBar.style.display = 'flex';
         } else {
@@ -2180,6 +2285,7 @@
       document.getElementById('story-modal').style.display = 'none';
       document.getElementById('chapter-modal').style.display = 'none';
       document.getElementById('char-modal').style.display = 'none';
+      document.getElementById('auth-modal').style.display = 'none';
       if (isZen) toggleZenMode();
     }
 
@@ -2256,7 +2362,7 @@
 
     function discardItem(idx) {
       userProfile.inventory.splice(idx, 1);
-      saveLocalProfile();
+      saveCurrentAccount();
       renderInventory();
     }
 
@@ -2353,17 +2459,8 @@
       addExp(20);
 
       showSystemAlert("GIAO DỊCH THÀNH CÔNG", `Đã mua: [${item.rank}] ${item.name} (-${item.price} Xu)`);
-      saveLocalProfile();
+      saveCurrentAccount();
       renderShop();
-    }
-
-    function changeAuthorName() {
-      const newName = prompt("Nhập bút danh mới:", userProfile.name);
-      if (newName && newName.trim()) {
-        userProfile.name = newName.trim();
-        saveLocalProfile();
-        renderHome();
-      }
     }
 
     function setReadingFontSize(size) {
@@ -2396,7 +2493,8 @@
       return (str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    applyUserRole();
+    // KHỞI ĐỘNG HỆ THỐNG
+    loadLocalAccountProfile();
     renderHome();
     startCooldownTicker();
   </script>
