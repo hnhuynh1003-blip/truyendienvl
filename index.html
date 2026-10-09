@@ -63,7 +63,7 @@
       font-family: var(--font-body);
       line-height: 1.8;
       min-height: 100vh;
-      padding-bottom: 70px;
+      padding-bottom: 80px;
       transition: background-color 0.25s, color 0.25s;
     }
 
@@ -139,6 +139,34 @@
     body.is-reader .admin-only {
       display: none !important;
     }
+
+    /* NÚT ĐIỀU HƯỚNG NỔI KHI CUỘN ĐỌC TRUYỆN */
+    .floating-reading-controls {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      left: 20px;
+      z-index: 1000;
+      gap: 8px;
+      background: rgba(10, 14, 20, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 6px 10px;
+      border-radius: 30px;
+      border: 1px solid var(--accent);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+    .floating-btn {
+      background: transparent;
+      border: none;
+      color: var(--neon);
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 8px;
+      cursor: pointer;
+      border-radius: 14px;
+      transition: background 0.2s;
+    }
+    .floating-btn:hover { background: rgba(102, 252, 241, 0.15); }
 
     /* BỘ LỌC TÌM KIẾM & TAG */
     .filter-panel {
@@ -551,6 +579,13 @@
 
   <div class="reader-progress-bar" id="reading-bar"></div>
 
+  <!-- NÚT ĐIỀU HƯỚNG NỔI KHI CUỘN ĐỌC TRUYỆN -->
+  <div class="floating-reading-controls" id="floating-reading-bar">
+    <button class="floating-btn" onclick="goHome()">🏠 Tủ Truyện</button>
+    <button class="floating-btn" onclick="goCover()">📑 Mục Lục</button>
+    <button class="floating-btn" onclick="scrollToTop()">▲ Lên Đầu</button>
+  </div>
+
   <!-- BANNER THÔNG BÁO HỆ THỐNG -->
   <div id="system-alert-banner">
     <div style="font-size:11px; color:var(--neon); font-weight:bold; letter-spacing:1px;" id="sys-alert-title">[HỆ THỐNG PHÁT ĐỘNG]</div>
@@ -761,7 +796,7 @@
         <button class="btn" style="width: 100%; font-size: 11px;" onclick="changeAuthorName()">Đổi Bút Danh</button>
       </div>
 
-      <!-- APP: KHO ĐỒ (CÓ NÚT KHÓA ĐẾM NGƯỢC THỜI GIAN THẬT) -->
+      <!-- APP: KHO ĐỒ (KHÓA ĐẾM NGƯỢC THỜI GIAN THẬT) -->
       <div class="phone-sub-app" id="phone-app-inventory">
         <div class="phone-app-header">
           <button class="phone-back-btn" onclick="phoneHome()">‹</button>
@@ -1088,7 +1123,9 @@
     ];
 
     let novels = JSON.parse(localStorage.getItem('my_novels_library_db')) || initialNovels;
-    let userProfile = JSON.parse(localStorage.getItem('my_cyber_profile')) || {
+
+    // TÀI KHOẢN, KHO ĐỒ, CẤP BẬC LƯU RIÊNG TỪNG THIẾT BỊ (ĐỘC LẬP HOÀN TOÀN)
+    let userProfile = JSON.parse(localStorage.getItem('my_device_local_profile')) || {
       name: "Kẻ Lang Bạt",
       title: "Thực Thể Ký Tự",
       exp: 40,
@@ -1127,7 +1164,7 @@
     let questTab = "ALL";
     let isZen = false;
 
-    // THỜI GIAN HỒI CHIÊU NHẶT ĐỒ (COOLDOWN 10 PHÚT)
+    // COOLDOWN 10 PHÚT
     const COOLDOWN_DURATION = 10 * 60 * 1000;
     let lastLootTimestamp = parseInt(localStorage.getItem('my_last_loot_ts')) || 0;
     let cooldownTimerInterval = null;
@@ -1148,23 +1185,25 @@
     function toggleUserRole() {
       userProfile.role = (userProfile.role === 'admin') ? 'reader' : 'admin';
       applyUserRole();
-      saveDB();
+      saveLocalProfile();
     }
 
-    // ==========================================
-    // CƠ CHẾ LƯU & ĐỒNG BỘ CHỐNG ĐÈ TỪ ĐIỆN THOẠI
-    // ==========================================
+    // LƯU RIÊNG TÀI KHOẢN VÀ KHO ĐỒ CHO MỖI THIẾT BỊ
+    function saveLocalProfile() {
+      localStorage.setItem('my_device_local_profile', JSON.stringify(userProfile));
+      updatePhoneUI();
+    }
+
+    // ĐỒNG BỘ NỘI DUNG TRUYỆN LÊN FIREBASE (CHỈ ĐỒNG BỘ TRUYỆN)
     function saveDB() {
       localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
-      localStorage.setItem('my_cyber_profile', JSON.stringify(userProfile));
-      updatePhoneUI();
+      saveLocalProfile();
 
       const indicator = document.getElementById('cloud-indicator');
       if (indicator) indicator.textContent = "☁️ Đang lưu...";
 
       docRef.set({
         novels: novels,
-        userProfile: userProfile,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }, { merge: true })
       .then(() => {
@@ -1175,6 +1214,7 @@
       });
     }
 
+    // LẮNG NGHE ĐỒNG BỘ TRUYỆN (KHÔNG ĐÈ KHO ĐỒ HAY TÀI KHOẢN RIÊNG)
     docRef.onSnapshot((doc) => {
       const indicator = document.getElementById('cloud-indicator');
       if (doc.exists) {
@@ -1188,33 +1228,10 @@
           localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
         }
 
-        // Hợp nhất dữ liệu an toàn - ưu tiên giữ số liệu cao nhất
-        if (data.userProfile) {
-          const curRole = userProfile.role;
-          const cloudP = data.userProfile;
-
-          userProfile.name = cloudP.name || userProfile.name;
-          userProfile.title = cloudP.title || userProfile.title;
-          userProfile.level = Math.max(parseInt(userProfile.level) || 1, parseInt(cloudP.level) || 1);
-          userProfile.exp = Math.max(parseInt(userProfile.exp) || 0, parseInt(cloudP.exp) || 0);
-          userProfile.currency = Math.max(parseInt(userProfile.currency) || 0, parseInt(cloudP.currency) || 0);
-          userProfile.role = curRole;
-
-          if (cloudP.inventory && Array.isArray(cloudP.inventory)) {
-            userProfile.inventory = cloudP.inventory;
-          }
-          if (cloudP.quests && Array.isArray(cloudP.quests)) {
-            userProfile.quests = cloudP.quests;
-          }
-          localStorage.setItem('my_cyber_profile', JSON.stringify(userProfile));
-        }
-
         renderHome();
         updatePhoneUI();
-
-        if (indicator) indicator.textContent = "☁️ Đã đồng bộ";
+        if (indicator) indicator.textContent = "☁️ Đã đồng bộ truyện";
       } else {
-        // Điện thoại hoặc thiết bị mới tuyệt đối không tự ý gọi saveDB() khi Firebase chưa có dữ liệu
         if (indicator) indicator.textContent = "☁️ Sẵn sàng";
       }
     }, (err) => {
@@ -1288,7 +1305,7 @@
         showSystemAlert("THĂNG CẤP THỰC THỂ!", `Đạt LEVEL ${userProfile.level} (+30 Xu Thưởng)`);
       }
 
-      saveDB();
+      saveLocalProfile();
     }
 
     function advanceQuest(questId, amount = 1) {
@@ -1298,7 +1315,7 @@
         if (q.current >= q.target) {
           showSystemAlert("ĐINH! NHIỆM VỤ HOÀN TẤT", `Nhiệm vụ: "${q.title}" đã sẵn sàng nhận thưởng!`);
         }
-        saveDB();
+        saveLocalProfile();
         renderQuests();
       }
     }
@@ -1310,7 +1327,7 @@
         userProfile.currency += q.rewardCoin;
         addExp(q.rewardExp);
         showSystemAlert("NHẬN THƯỞNG THÀNH CÔNG", `+${q.rewardExp} EXP | +${q.rewardCoin} Xu Ký Tự 🪙`);
-        saveDB();
+        saveLocalProfile();
         renderQuests();
       }
     }
@@ -1323,7 +1340,7 @@
         }
       });
       showSystemAlert("HỆ THỐNG ĐÃ LÀM MỚI", "Toàn bộ nhiệm vụ hàng ngày đã được đặt lại!");
-      saveDB();
+      saveLocalProfile();
       renderQuests();
     }
 
@@ -1331,9 +1348,6 @@
       advanceQuest('q_hidden_glitch', 1);
     }
 
-    // ==========================================
-    // CƠ CHẾ GACHA VÔ HẠN LƯU & KHÓA NÚT THỜI GIAN THẬT
-    // ==========================================
     function startCooldownTicker() {
       if (cooldownTimerInterval) clearInterval(cooldownTimerInterval);
 
@@ -1367,7 +1381,6 @@
     function rollLootDrop(isFreeFromChapter = false) {
       const now = Date.now();
 
-      // Nếu bấm từ kho đồ và chưa hết thời gian chờ
       if (!isFreeFromChapter && (now - lastLootTimestamp < COOLDOWN_DURATION)) {
         const remainSec = Math.ceil((COOLDOWN_DURATION - (now - lastLootTimestamp)) / 1000);
         const mins = Math.floor(remainSec / 60);
@@ -1376,7 +1389,6 @@
         return;
       }
 
-      // TỈ LỆ GACHA VÔ HẠN LƯU KHẮC NGHIỆT (Chuẩn xác 1/10000)
       const roll = Math.random() * 10000;
       let targetRank = "F";
 
@@ -1388,13 +1400,12 @@
       else if (roll < 9970) targetRank = "A";   // 0.7%
       else if (roll < 9995) targetRank = "S";   // 0.25%
       else if (roll < 9999) targetRank = "SS";  // 0.04%
-      else targetRank = "SSS";                  // 0.01% (Tối thượng)
+      else targetRank = "SSS";                  // 0.01%
 
       const pool = MASTER_LOOT_TABLE.filter(item => item.rank === targetRank);
       const picked = pool[Math.floor(Math.random() * pool.length)] || MASTER_LOOT_TABLE[0];
 
-      // Thưởng xu theo phẩm cấp
-      let bonusCoins = Math.floor(Math.random() * 3) + 1; // Mặc định chỉ 1-3 xu
+      let bonusCoins = Math.floor(Math.random() * 3) + 1;
       if (["B", "A"].includes(targetRank)) bonusCoins = 15;
       if (["S", "SS"].includes(targetRank)) bonusCoins = 50;
       if (targetRank === "SSS") bonusCoins = 200;
@@ -1403,7 +1414,6 @@
       userProfile.inventory.unshift({ ...picked, instanceId: "item-" + Date.now() });
       addExp(targetRank === 'SSS' ? 100 : (targetRank === 'S' ? 40 : 10));
 
-      // Cập nhật lại thời gian nhặt và bắt đầu khóa nút
       lastLootTimestamp = now;
       localStorage.setItem('my_last_loot_ts', now.toString());
       startCooldownTicker();
@@ -1416,7 +1426,7 @@
         showSystemAlert("TÀN TÍCH DỮ LIỆU", `Nhặt được: [${picked.rank}] ${picked.name} (+${bonusCoins} Xu)`);
       }
 
-      saveDB();
+      saveLocalProfile();
       renderInventory();
     }
 
@@ -1436,7 +1446,6 @@
       return novel.updatedAt || "2026-10-09";
     }
 
-    // TỰ ĐỘNG THU NHỎ & NÉN ẢNH CANVAS CHỐNG CRASH FIREBASE
     function handleCoverFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1511,9 +1520,6 @@
       });
     }
 
-    // ==========================================
-    // CƠ CHẾ NÚT ĐỌC NGAY / ĐỌC TIẾP THÔNG MINH
-    // ==========================================
     function smartReadAction(novelIdx, event) {
       if (event) event.stopPropagation();
 
@@ -1730,6 +1736,10 @@
       }
     }
 
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function readChapter(chIdx, scrollPos = 0) {
       selectedChapterIndex = chIdx;
       const novel = novels[selectedNovelIndex];
@@ -1785,12 +1795,23 @@
       if (selectedChapterIndex < novel.chapters.length - 1) readChapter(selectedChapterIndex + 1);
     }
 
+    // LẮNG NGHE CUỘN: HIỆN NÚT NỔI VÀ LƯU BOOKMARK
     window.addEventListener('scroll', () => {
-      if (document.getElementById('reader-view').style.display === 'block') {
+      const isReaderActive = document.getElementById('reader-view').style.display === 'block';
+      const floatBar = document.getElementById('floating-reading-bar');
+
+      if (isReaderActive) {
         const winScroll = document.documentElement.scrollTop;
         const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
         const scrolled = (winScroll / height) * 100;
         document.getElementById('reading-bar').style.width = scrolled + '%';
+
+        // Tự động hiện thanh nút nổi khi cuộn xuống quá 200px
+        if (winScroll > 200) {
+          floatBar.style.display = 'flex';
+        } else {
+          floatBar.style.display = 'none';
+        }
 
         const novel = novels[selectedNovelIndex];
         if (novel && novel.chapters && novel.chapters.length > 0) {
@@ -1801,6 +1822,7 @@
         }
       } else {
         document.getElementById('reading-bar').style.width = '0%';
+        floatBar.style.display = 'none';
       }
     });
 
@@ -1824,10 +1846,15 @@
       document.getElementById('cover-view').style.display = 'none';
       document.getElementById('reader-view').style.display = 'none';
       document.getElementById('home-view').style.display = 'block';
+      document.getElementById('floating-reading-bar').style.display = 'none';
       renderHome();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    function goCover() { openCover(selectedNovelIndex); }
+    
+    function goCover() { 
+      document.getElementById('floating-reading-bar').style.display = 'none';
+      openCover(selectedNovelIndex); 
+    }
 
     function toggleZenMode() {
       isZen = !isZen;
@@ -2229,7 +2256,7 @@
 
     function discardItem(idx) {
       userProfile.inventory.splice(idx, 1);
-      saveDB();
+      saveLocalProfile();
       renderInventory();
     }
 
@@ -2326,7 +2353,7 @@
       addExp(20);
 
       showSystemAlert("GIAO DỊCH THÀNH CÔNG", `Đã mua: [${item.rank}] ${item.name} (-${item.price} Xu)`);
-      saveDB();
+      saveLocalProfile();
       renderShop();
     }
 
@@ -2334,7 +2361,7 @@
       const newName = prompt("Nhập bút danh mới:", userProfile.name);
       if (newName && newName.trim()) {
         userProfile.name = newName.trim();
-        saveDB();
+        saveLocalProfile();
         renderHome();
       }
     }
