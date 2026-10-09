@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Novel Studio</title>
+  
+  <!-- FIREBASE SDK COMPAT -->
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --bg-main: #0c1015;
+      --card-bg: #151d26;
+      --border: #223040;
+      --accent: #45a29e;
+      --neon: #66fcf1;
+      --text: #cbd5e1;
+      --text-dim: #8b9bb4;
+      --text-white: #f8fafc;
+      --font-body: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      --font-reading: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      --read-size: 18px;
+    }
+
+    body.theme-warm {
+      --bg-main: #fcf4e4;
+      --card-bg: #f4e8cf;
+      --border: #dfcbab;
+      --accent: #8b5a2b;
+      --neon: #59391a;
+      --text: #2c2419;
+      --text-dim: #6d5b45;
+      --text-white: #171108;
+    }
+
+    body.theme-oled {
+      --bg-main: #000000;
+      --card-bg: #0a0a0a;
+      --border: #1e1e1e;
+      --accent: #00ffcc;
+      --neon: #00ffcc;
+      --text: #c0c0c0;
+      --text-dim: #707070;
+      --text-white: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.8;
+      min-height: 100vh;
+      padding-bottom: 70px;
+      transition: background-color 0.25s, color 0.25s;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      background: var(--bg-main);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .brand {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--neon);
+      cursor: pointer;
+      letter-spacing: 0.5px;
+    }
+
+    .cloud-status {
+      font-size: 11px;
+      color: #10b981;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 8px;
+    }
+
+    .btn {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--neon);
+      padding: 6px 14px;
+      font-size: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover, .btn:active { background: var(--accent); color: #0b0c10; }
+    .btn-primary { background: var(--accent); color: #0b0c10; font-weight: 600; }
+    .btn-danger { border-color: #ef4444; color: #ef4444; }
+    .btn-danger:hover { background: #ef4444; color: #fff; }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 20px 16px;
+    }
+
+    /* GLITCH EFFECT */
+    .glitch-text {
+      position: relative;
+      display: inline-block;
+    }
+    .glitch-text:hover {
+      animation: glitch-anim 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+    }
+    @keyframes glitch-anim {
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 1px); text-shadow: 2px 0 #ef4444, -2px 0 #00ffcc; }
+      40% { transform: translate(1px, -1px); text-shadow: -2px 0 #ef4444, 2px 0 #00ffcc; }
+      60% { transform: translate(-1px, 2px); text-shadow: 2px 0 #00ffcc, -2px 0 #ef4444; }
+      80% { transform: translate(2px, -1px); text-shadow: -2px 0 #00ffcc, 2px 0 #ef4444; }
+      100% { transform: translate(0); }
+    }
+
+    /* MÀN HÌNH 1: TỦ TRUYỆN */
+    .library-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .filter-group { display: flex; gap: 8px; align-items: center; }
+    .filter-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .filter-btn.active { border-color: var(--neon); color: var(--neon); font-weight: bold; }
+
+    .novel-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    @media (min-width: 660px) { .novel-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .novel-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .novel-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+
+    .novel-cover {
+      width: 110px;
+      min-width: 110px;
+      background: linear-gradient(135deg, rgba(69, 162, 158, 0.25) 0%, rgba(0,0,0,0.45) 100%);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 12px 6px;
+      color: var(--neon);
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .novel-info {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex: 1;
+    }
+    .novel-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+    .tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); color: var(--text-dim); }
+    .tag-status { color: var(--neon); border-color: var(--accent); }
+
+    .novel-title { font-size: 17px; font-weight: bold; color: var(--text-white); margin-bottom: 6px; }
+    .novel-desc {
+      font-size: 13px; color: var(--text-dim);
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px;
+    }
+    .novel-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: var(--accent); border-top: 1px solid var(--border); padding-top: 8px;
+    }
+
+    /* MÀN HÌNH 2: TRANG BÌA & MỤC LỤC */
+    #cover-view { display: none; }
+    .book-cover-banner {
+      display: flex; flex-direction: column; gap: 20px;
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 22px; margin-bottom: 24px;
+    }
+    @media (min-width: 600px) { .book-cover-banner { flex-direction: row; align-items: center; } }
+
+    .book-cover-art {
+      width: 145px; height: 200px; min-width: 145px; margin: 0 auto;
+      background: linear-gradient(135deg, #1f2833 0%, #0b0c10 100%);
+      border: 2px solid var(--neon); border-radius: 8px;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 12px; text-align: center; color: var(--neon);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .book-banner-meta { flex: 1; }
+    .book-banner-meta h1 { font-size: 26px; color: var(--text-white); margin-bottom: 6px; }
+    .book-stats { font-size: 13px; color: var(--neon); margin-bottom: 12px; display: flex; gap: 14px; flex-wrap: wrap; }
+
+    .intro-terminal-box {
+      background: rgba(15, 20, 25, 0.7);
+      border: 1px solid var(--accent);
+      border-left: 4px solid var(--neon);
+      border-radius: 8px; padding: 16px; margin-bottom: 24px;
+    }
+    .intro-header {
+      font-size: 12px; font-weight: bold; color: var(--neon); letter-spacing: 1.5px;
+      margin-bottom: 8px; display: flex; justify-content: space-between;
+    }
+    .intro-text {
+      font-size: 14px; color: var(--text-dim); font-family: "Courier New", Courier, monospace;
+      white-space: pre-line; line-height: 1.6;
+    }
+
+    .index-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .chapter-items { display: flex; flex-direction: column; gap: 10px; }
+    .chapter-item {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .chapter-name-click { cursor: pointer; flex: 1; font-size: 15px; color: var(--text-white); }
+    .chapter-name-click:hover { color: var(--neon); }
+
+    /* MÀN HÌNH 3: TRÌNH ĐỌC */
+    #reader-view { display: none; }
+    .reader-progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px; background: var(--neon);
+      width: 0%; z-index: 1000; transition: width 0.1s;
+    }
+    .reader-top-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 22px;
+    }
+    .reader-chapter-title { font-size: 24px; color: var(--text-white); font-weight: bold; margin-bottom: 8px; }
+    .reading-time-badge { font-size: 12px; color: var(--text-dim); margin-bottom: 24px; }
+    .reader-body {
+      font-family: var(--font-reading);
+      font-size: var(--read-size);
+      color: var(--text);
+      text-align: justify;
+      line-height: 1.85;
+    }
+    .reader-body p { margin-bottom: 20px; text-indent: 1.5em; }
+
+    .author-note-box {
+      margin-top: 36px; padding: 16px; border-radius: 8px;
+      background: rgba(69, 162, 158, 0.08); border-left: 3px solid var(--accent);
+      font-size: 14px; color: var(--text-dim);
+    }
+    .author-note-title { font-weight: bold; color: var(--neon); margin-bottom: 6px; }
+
+    .reader-bottom-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border);
+    }
+
+    /* CYBER MINI PHONE */
+    #phone-fab {
+      position: fixed; bottom: 24px; right: 24px; width: 58px; height: 58px;
+      border-radius: 50%; background: #0f1620; border: 2px solid var(--neon); color: var(--neon);
+      display: flex; justify-content: center; align-items: center; font-size: 24px;
+      cursor: pointer; box-shadow: 0 0 20px rgba(102, 252, 241, 0.4); z-index: 1000;
+      transition: transform 0.2s;
+    }
+    #phone-fab:hover { transform: scale(1.08); }
+
+    #cyber-phone {
+      display: none; position: fixed; bottom: 90px; right: 24px; width: 330px; height: 540px;
+      background: #090d12; border: 3px solid #334155; border-radius: 36px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 15px rgba(69, 162, 158, 0.3);
+      z-index: 999; flex-direction: column; overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .phone-speaker { width: 60px; height: 4px; background: #334155; border-radius: 2px; margin: 12px auto 6px auto; }
+    .phone-screen {
+      flex: 1; margin: 4px 10px 10px 10px; background: #111822; border-radius: 24px;
+      border: 1px solid #1f2937; display: flex; flex-direction: column; overflow: hidden; position: relative;
+    }
+    .phone-status-bar {
+      display: flex; justify-content: space-between; padding: 6px 14px; font-size: 10px;
+      color: #64748b; font-family: monospace; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    #phone-home-screen { flex: 1; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+    .phone-widgets {
+      background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; border-radius: 12px; padding: 10px; text-align: center;
+    }
+    .widget-level { font-size: 12px; color: var(--neon); font-weight: bold; }
+    .widget-exp-bar { background: #1e293b; height: 6px; border-radius: 3px; margin: 6px 0; overflow: hidden; }
+    .widget-exp-fill { background: var(--neon); height: 100%; width: 30%; transition: width 0.3s; }
+
+    .phone-app-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 12px 0; }
+    .app-icon { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+    .app-box {
+      width: 48px; height: 48px; border-radius: 12px; display: flex; justify-content: center;
+      align-items: center; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.15s;
+    }
+    .app-icon:active .app-box { transform: scale(0.9); }
+    .app-label { font-size: 10px; color: #cbd5e1; }
+
+    .phone-sub-app {
+      display: none; flex: 1; flex-direction: column; padding: 12px; overflow-y: auto; font-size: 13px; color: #e2e8f0;
+    }
+    .phone-app-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 6px;
+      border-bottom: 1px solid #334155; color: var(--neon); font-weight: bold;
+    }
+    .phone-back-btn { background: none; border: none; color: var(--neon); font-size: 14px; cursor: pointer; }
+
+    .badge-card, .character-card {
+      background: #1a2230; border: 1px solid #334155; border-radius: 8px; padding: 8px; margin-bottom: 8px;
+      display: flex; gap: 8px; align-items: flex-start;
+    }
+    .badge-unlocked { border-color: var(--neon); background: rgba(102, 252, 241, 0.08); }
+    .phone-home-bar { width: 80px; height: 4px; background: #475569; border-radius: 2px; margin: 6px auto; cursor: pointer; }
+
+    /* ZEN MODE */
+    .zen-active {
+      position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+      width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important;
+      border-radius: 0 !important; z-index: 2000 !important; border: none !important;
+    }
+    .zen-active textarea { height: calc(100vh - 220px) !important; font-size: 18px !important; }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
+      z-index: 1200; justify-content: center; align-items: center; padding: 16px;
+    }
+    .modal-card {
+      background: var(--card-bg); border: 1px solid var(--accent); border-radius: 12px;
+      width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; padding: 20px;
+      display: flex; flex-direction: column; gap: 14px; transition: all 0.3s;
+    }
+    .modal-card h2 { color: var(--neon); font-size: 18px; }
+    .modal-field { display: flex; flex-direction: column; gap: 6px; }
+    .modal-field label { font-size: 12px; color: var(--text-dim); }
+    .modal-field input, .modal-field textarea, .modal-field select {
+      background: var(--bg-main); border: 1px solid var(--border); border-radius: 6px;
+      padding: 10px; color: var(--text); font-family: inherit; outline: none;
+    }
+    .word-counter { font-size: 11px; color: var(--accent); text-align: right; }
+  </style>
+</head>
+<body>
+
+  <div class="reader-progress-bar" id="reading-bar"></div>
+
+  <header>
+    <div class="brand" onclick="goHome()">
+      ✦ CYBER NOVEL STUDIO
+      <span class="cloud-status" id="cloud-indicator">☁️ Đang kết nối...</span>
+    </div>
+    <div>
+      <button class="btn btn-primary" onclick="openStoryModal()">+ Tạo tác phẩm</button>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- 1. TỦ TRUYỆN -->
+    <div id="home-view">
+      <div class="library-toolbar">
+        <div>
+          <h2 style="color: var(--text-white); font-size: 20px;">Tủ Tiểu Thuyết Cá Nhân</h2>
+          <div style="font-size: 13px; color: var(--text-dim); margin-top: 2px;">Dữ liệu đồng bộ đám mây Firebase Real-time</div>
+        </div>
+        <div class="filter-group">
+          <button class="filter-btn active" onclick="filterStatus('ALL', this)">Tất cả</button>
+          <button class="filter-btn" onclick="filterStatus('Đang ra', this)">Đang ra</button>
+          <button class="filter-btn" onclick="filterStatus('Hoàn thành', this)">Hoàn thành</button>
+        </div>
+      </div>
+      <div class="novel-grid" id="novel-grid-container"></div>
+    </div>
+
+    <!-- 2. TRANG BÌA & MỤC LỤC -->
+    <div id="cover-view">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+        <button class="btn" onclick="goHome()">‹ Về Tủ Truyện</button>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-primary" id="btn-resume-reading" style="display:none;" onclick="resumeLastReading()">▶ Đọc tiếp</button>
+          <button class="btn" onclick="openEditStoryModal()">✎ Sửa truyện</button>
+          <button class="btn btn-danger" onclick="deleteCurrentNovel()">Xóa truyện</button>
+        </div>
+      </div>
+
+      <div class="book-cover-banner">
+        <div class="book-cover-art">
+          <div style="font-size: 32px; margin-bottom: 8px;">📖</div>
+          <div style="font-size: 15px; font-weight: bold; line-height: 1.3;" id="cover-art-title">Tên Truyện</div>
+          <div style="font-size: 10px; opacity: 0.7; margin-top: 6px;" id="cover-art-genre">Vô hạn lưu</div>
+        </div>
+
+        <div class="book-banner-meta">
+          <h1 id="book-title">Tên Tác Phẩm</h1>
+          <div class="book-stats">
+            <span>Tác giả: <b id="book-author" style="color:var(--text-white)">Tôi</b></span>
+            <span>Trạng thái: <b id="book-status" style="color:var(--neon)">Đang ra</b></span>
+            <span>Tổng số: <b id="book-chapter-count">0 chương</b></span>
+            <span>Tổng chữ: <b id="book-word-count">0 chữ</b></span>
+          </div>
+          <p style="font-size: 14px; color: var(--text); line-height: 1.6;" id="book-desc">Tóm tắt tác phẩm...</p>
+        </div>
+      </div>
+
+      <!-- KHUNG VĂN ÁN -->
+      <div class="intro-terminal-box">
+        <div class="intro-header">
+          <span id="intro-box-title">◆ VĂN ÁN // GLITCH RECORD</span>
+          <span class="glitch-text" id="intro-box-code" style="font-family:monospace; cursor:pointer;" title="Nhấp để nghe tín hiệu glitch" onclick="playGlitchSound()">SYS_ERR_0x000F89</span>
+        </div>
+        <div class="intro-text" id="book-intro">[ Chưa có văn án ]</div>
+      </div>
+
+      <!-- MỤC LỤC -->
+      <div class="index-toolbar">
+        <div style="font-size: 18px; font-weight: bold; color: var(--text-white);">Mục Lục Chương</div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn" onclick="toggleChapterOrder()">Đảo thứ tự ⇅</button>
+          <button class="btn btn-primary" onclick="openCreateChapterModal()">+ Viết chương mới</button>
+        </div>
+      </div>
+      <div class="chapter-items" id="chapter-list-container"></div>
+    </div>
+
+    <!-- 3. TRÌNH ĐỌC TRUYỆN -->
+    <div id="reader-view">
+      <div class="reader-top-nav">
+        <button class="btn" onclick="goCover()">‹ Mục lục</button>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 13px; color: var(--accent);" id="reader-book-name">Tên Truyện</span>
+          <button class="btn" onclick="openPhoneApp('settings'); togglePhone();">⚙️ Cài đặt</button>
+          <button class="btn" onclick="editCurrentReadingChapter()">✎ Sửa chương</button>
+        </div>
+      </div>
+
+      <div class="reader-chapter-title" id="reader-ch-title">Chương 1</div>
+      <div class="reading-time-badge" id="reader-ch-time">⏱ Khoảng 1 phút đọc</div>
+      <div class="reader-body" id="reader-content"></div>
+
+      <!-- LỜI NHẮN TÁC GIẢ -->
+      <div class="author-note-box" id="reader-author-note-box" style="display:none;">
+        <div class="author-note-title">Lời nhắn tác giả:</div>
+        <div id="reader-author-note-content"></div>
+      </div>
+
+      <div class="reader-bottom-nav">
+        <button class="btn" id="btn-prev-ch" onclick="prevChapter()">‹ [←] Chương trước</button>
+        <button class="btn" onclick="goCover()">Mục lục</button>
+        <button class="btn" id="btn-next-ch" onclick="nextChapter()">Chương sau [→] ›</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CYBER MINI PHONE -->
+  <div id="phone-fab" onclick="togglePhone()" title="Mở Cyber Phone [P]">📱</div>
+
+  <div id="cyber-phone">
+    <div class="phone-speaker"></div>
+    <div class="phone-screen">
+      <div class="phone-status-bar">
+        <span>12:00</span>
+        <span>CYBER-OS ⚡</span>
+      </div>
+
+      <div id="phone-home-screen">
+        <div class="phone-widgets">
+          <div class="widget-level" id="phone-level-display">LV.1 - Tân Binh Ký Tự</div>
+          <div class="widget-exp-bar">
+            <div class="widget-exp-fill" id="phone-exp-fill"></div>
+          </div>
+          <div style="font-size: 10px; color: #64748b;" id="phone-exp-text">EXP: 0 / 100</div>
+        </div>
+
+        <div class="phone-app-grid">
+          <div class="app-icon" onclick="openPhoneApp('profile')">
+            <div class="app-box" style="background: #3b82f6;">👤</div>
+            <div class="app-label">Cá Nhân</div>
+          </div>
+          <div class="app-icon" onclick="openPhoneApp('badges')">
+            <div class="app-box" style="background: #eab308;">🏅</div>
+            <div class="app-label">Huy Hiệu</div>
+          </div>
+          <div class="app-icon" onclick="openPhoneApp('codex')">
+            <div class="app-box" style="background: #ec4899;">📜</div>
+            <div class="app-label">Sổ Tay</div>
+          </div>
+          <div class="app-icon" onclick="openPhoneApp('settings')">
+            <div class="app-box" style="background: #64748b;">⚙️</div>
+            <div class="app-label">Cài Đặt</div>
+          </div>
+          <div class="app-icon" onclick="openPhoneApp('backup')">
+            <div class="app-box" style="background: #10b981;">💾</div>
+            <div class="app-label">Sao Lưu</div>
+          </div>
+        </div>
+
+        <div style="text-align: center; font-size: 10px; color: #475569;">FIREBASE CLOUD CONNECTED</div>
+      </div>
+
+      <!-- APP: HỒ SƠ -->
+      <div class="phone-sub-app" id="phone-app-profile">
+        <div class="phone-app-header">
+          <button class="phone-back-btn" onclick="phoneHome()">‹</button>
+          <span>Hồ Sơ Tác Giả</span>
+          <span></span>
+        </div>
+        <div style="text-align: center; margin-bottom: 12px;">
+          <div style="font-size: 38px;">🧙‍♂️</div>
+          <div style="font-weight: bold; color: var(--neon); font-size: 15px;" id="profile-name">Kẻ Lang Bạt</div>
+          <div style="font-size: 11px; color: #64748b;">Nhà Sáng Tạo Thế Giới</div>
+        </div>
+        <div style="background: #1e293b; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 10px;">
+          <div>📚 Số truyện: <b id="stat-novels" style="color:var(--neon)">1</b></div>
+          <div style="margin-top: 4px;">📝 Tổng chương: <b id="stat-chapters" style="color:var(--neon)">1</b></div>
+          <div style="margin-top: 4px;">🔤 Tổng từ đã viết: <b id="stat-total-words" style="color:var(--neon)">0</b></div>
+        </div>
+        <button class="btn" style="width: 100%; font-size: 11px;" onclick="changeAuthorName()">Đổi Bút Danh</button>
+      </div>
+
+      <!-- APP: HUY HIỆU -->
+      <div class="phone-sub-app" id="phone-app-badges">
+        <div class="phone-app-header">
+          <button class="phone-back-btn" onclick="phoneHome()">‹</button>
+          <span>Huy Hiệu Đạt Được</span>
+          <span></span>
+        </div>
+        <div id="badges-container"></div>
+      </div>
+
+      <!-- APP: SỔ TAY NHÂN VẬT THEO TỪNG TRUYỆN -->
+      <div class="phone-sub-app" id="phone-app-codex">
+        <div class="phone-app-header">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button class="phone-back-btn" onclick="phoneHome()">‹</button>
+            <span>Sổ Tay Nhân Vật</span>
+          </div>
+          <button class="btn" style="padding: 2px 8px; font-size: 10px;" onclick="openAddCharacterModal()">+ Thêm</button>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+          <label style="font-size: 10px; color: #94a3b8;">Chọn truyện để xem nhân vật:</label>
+          <select id="codex-novel-selector" onchange="renderCodexList()" style="width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px; color: #fff; font-size: 11px; margin-top: 3px; outline: none;"></select>
+        </div>
+
+        <div id="codex-container"></div>
+      </div>
+
+      <!-- APP: CÀI ĐẶT -->
+      <div class="phone-sub-app" id="phone-app-settings">
+        <div class="phone-app-header">
+          <button class="phone-back-btn" onclick="phoneHome()">‹</button>
+          <span>Tùy Biến Đọc Sách</span>
+          <span></span>
+        </div>
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 11px; color: #94a3b8;">Cỡ chữ đọc:</label>
+          <div style="display: flex; gap: 8px; margin-top: 4px;">
+            <button class="btn" style="flex:1" onclick="setReadingFontSize(16)">16px</button>
+            <button class="btn" style="flex:1" onclick="setReadingFontSize(18)">18px</button>
+            <button class="btn" style="flex:1" onclick="setReadingFontSize(21)">21px</button>
+          </div>
+        </div>
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 11px; color: #94a3b8;">Kiểu font:</label>
+          <div style="display: flex; gap: 8px; margin-top: 4px;">
+            <button class="btn" style="flex:1" onclick="setReadingFont('sans')">Hiện đại</button>
+            <button class="btn" style="flex:1" onclick="setReadingFont('serif')">Cổ điển</button>
+          </div>
+        </div>
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 11px; color: #94a3b8;">Chủ đề màu:</label>
+          <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 4px;">
+            <button class="btn" onclick="setTheme('default')">Dark Terminal</button>
+            <button class="btn" onclick="setTheme('warm')">Warm Paper</button>
+            <button class="btn" onclick="setTheme('oled')">OLED Black</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- APP: SAO LƯU -->
+      <div class="phone-sub-app" id="phone-app-backup">
+        <div class="phone-app-header">
+          <button class="phone-back-btn" onclick="phoneHome()">‹</button>
+          <span>Sao Lưu & Đồng Bộ</span>
+          <span></span>
+        </div>
+        <p style="font-size: 11px; color: #94a3b8; margin-bottom: 12px;">Dữ liệu đã tự động đồng bộ lên Firebase. Bạn vẫn có thể tải bản JSON dự phòng về máy.</p>
+        <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="exportData()">Xuất Dữ Liệu (.json)</button>
+        <input type="file" id="import-file" style="display:none;" onchange="importData(event)">
+        <button class="btn" style="width: 100%;" onclick="document.getElementById('import-file').click()">Khôi Phục Từ File</button>
+      </div>
+
+      <div class="phone-home-bar" onclick="phoneHome()"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: TẠO / SỬA TRUYỆN -->
+  <div class="modal-overlay" id="story-modal">
+    <div class="modal-card">
+      <h2 id="story-modal-heading">THÊM TÁC PHẨM MỚI</h2>
+      <div class="modal-field">
+        <label>Tên tác phẩm:</label>
+        <input type="text" id="story-modal-title" placeholder="Ví dụ: truyện điên vl">
+      </div>
+      <div class="modal-field">
+        <label>Thể loại / Tags:</label>
+        <input type="text" id="story-modal-genre" placeholder="Vô hạn lưu, Hệ thống, Kinh dị...">
+      </div>
+      <div class="modal-field">
+        <label>Trạng thái:</label>
+        <select id="story-modal-status">
+          <option value="Đang ra">Đang ra</option>
+          <option value="Tạm dừng">Tạm dừng</option>
+          <option value="Hoàn thành">Hoàn thành</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>Tóm tắt ngắn (Hiện ngoài bìa):</label>
+        <input type="text" id="story-modal-desc" placeholder="Tóm tắt ngắn gọn...">
+      </div>
+      <div class="modal-field">
+        <label>Khung văn án mở đầu (Terminal glitch):</label>
+        <textarea id="story-modal-intro" style="height: 100px;" placeholder="Mã nguồn lỗi, trích dẫn bối cảnh..."></textarea>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+        <button class="btn" onclick="closeModals()">Hủy</button>
+        <button class="btn btn-primary" onclick="saveStoryModal()">Lưu Tác Phẩm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: TẠO / SỬA CHƯƠNG -->
+  <div class="modal-overlay" id="chapter-modal">
+    <div class="modal-card" id="chapter-modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 id="chapter-modal-heading">VIẾT CHƯƠNG MỚI</h2>
+        <button class="btn" onclick="toggleZenMode()">⛶ Zen Mode</button>
+      </div>
+      <div class="modal-field">
+        <label>Tên chương:</label>
+        <input type="text" id="chapter-modal-title" placeholder="Ví dụ: Chương 1: Khoảng Trắng Của Kẻ Lang Bạt">
+      </div>
+      <div class="modal-field">
+        <label>Nội dung chương (Đang tự động lưu nháp):</label>
+        <textarea id="chapter-modal-content" style="height: 240px;" oninput="onChapterInput()" placeholder="Dán nội dung chương vào đây..."></textarea>
+        <div class="word-counter" id="ch-word-preview">0 từ</div>
+      </div>
+      <div class="modal-field">
+        <label>Lời nhắn của tác giả ở cuối chương (Author Note - tùy chọn):</label>
+        <input type="text" id="chapter-modal-author-note" placeholder="Lời bình hoặc thông báo ra chương tiếp...">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+        <button class="btn" onclick="closeModals()">Hủy</button>
+        <button class="btn btn-primary" onclick="saveChapterModal()">Lưu Nội Dung</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SỔ TAY NHÂN VẬT -->
+  <div class="modal-overlay" id="char-modal">
+    <div class="modal-card">
+      <h2 id="char-modal-heading">THÊM NHÂN VẬT MỚI</h2>
+      <div class="modal-field">
+        <label>Tên nhân vật:</label>
+        <input type="text" id="char-input-name" placeholder="Ví dụ: Ôn Tri Hành">
+      </div>
+      <div class="modal-field">
+        <label>Vai trò / Thân phận:</label>
+        <input type="text" id="char-input-role" placeholder="Ví dụ: Nhân vật chính, Đồng hành, Kẻ thù...">
+      </div>
+      <div class="modal-field">
+        <label>Trạng thái hiện tại:</label>
+        <input type="text" id="char-input-status" placeholder="Ví dụ: Còn sống, Đã chết, Mất kết nối, Bị phong tỏa...">
+      </div>
+      <div class="modal-field">
+        <label>Ghi chú / Mô tả đặc điểm:</label>
+        <textarea id="char-input-note" style="height: 80px;" placeholder="Ghi chú về tính cách, ký ức hoặc manh mối..."></textarea>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+        <button class="btn" onclick="closeModals()">Hủy</button>
+        <button class="btn btn-primary" onclick="saveCharacterModal()">Lưu Nhân Vật</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // CẤU HÌNH FIREBASE CỦA BẠN
+    const firebaseConfig = {
+      apiKey: "AIzaSyCzZF18xI8nM1TLqR1q3x7HxZYE-0_VMtk",
+      authDomain: "truyendienvl.firebaseapp.com",
+      projectId: "truyendienvl",
+      storageBucket: "truyendienvl.firebasestorage.app",
+      messagingSenderId: "487918800274",
+      appId: "1:487918800274:web:ad23376d4313cd7315054b",
+      measurementId: "G-CKKGWKGC41"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const docRef = db.collection("studio_data").doc("main_library");
+
+    // WEB AUDIO SYNTH
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep(freq = 440, duration = 0.05, type = 'sine') {
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    function playClickSound() { playBeep(700, 0.03, 'triangle'); }
+    function playGlitchSound() {
+      playBeep(120, 0.08, 'sawtooth');
+      setTimeout(() => playBeep(280, 0.05, 'square'), 70);
+    }
+    function playLevelUpSound() {
+      playBeep(330, 0.08, 'triangle');
+      setTimeout(() => playBeep(440, 0.08, 'triangle'), 80);
+      setTimeout(() => playBeep(554, 0.08, 'triangle'), 160);
+      setTimeout(() => playBeep(659, 0.15, 'square'), 240);
+    }
+
+    // DỮ LIỆU BAN ĐẦU
+    const initialNovels = [
+      {
+        id: "truyen-dien-vl",
+        title: "truyện điên vl",
+        author: "Tôi",
+        genre: "Vô hạn lưu, Hệ thống, Glitch",
+        status: "Đang ra",
+        desc: "Linh hồn lang bạt rơi vào khoảng không vô tận của một hệ thống trục trặc.",
+        coverStyle: "cyber-glitch",
+        introData: {
+          title: "VĂN ÁN // GLITCH RECORD",
+          code: "SYS_ERR_0x000F89",
+          text: `[Lỗi kết nối máy chủ cốt lõi: 0x000F89]\n[Ký ức thực thể: Phong tỏa 68%...]\n[Kho đồ cá nhân: Khóa quyền truy cập (Dữ liệu không đồng bộ)]\n[Chuyển giao mục tiêu: Ngẫu nhiên...]`
+        },
+        characters: [
+          { id: "c1", name: "Tôi", role: "Nhân vật chính", status: "Mảnh vụn dữ liệu lỗi", note: "Linh hồn lang bạt qua hàng ngàn năm tích lũy tri thức." },
+          { id: "c2", name: "Ôn Tri Hành", role: "Cố nhân", status: "Mất kết nối", note: "Bóng hình không còn xuất hiện sau khi hệ thống trục trặc." },
+          { id: "c3", name: "Thẩm Cẩm Thư", role: "Cố nhân", status: "Mất kết nối", note: "Một trong những người từng đi qua đời nhân vật chính." },
+          { id: "c4", name: "Tô Thanh Lạc", role: "Ký ức nhạt nhòa", status: "Bị phong tỏa", note: "Gắn liền với cơn mưa Thượng Hải và phòng net tồi tàn." }
+        ],
+        chapters: [
+          {
+            id: "ch-1",
+            title: "Chương 1: Khoảng Trắng Của Kẻ Lang Bạt",
+            content: `Khi nhịp tim cuối cùng ở tầng hầm Dung Thành vụt tắt, tôi không rơi vào bóng tối vĩnh hằng như mình từng mong đợi.\n\nCái chết đối với một kẻ mang linh hồn lang bạt như tôi chưa từng là điểm dừng chân. Nó chỉ là một lần hệ thống trục trặc tự động khởi động lại. Một không gian trắng xóa vô tận, không có trọng lực, không có tiếng thở, và hoàn toàn vắng bóng bóng hình của Ôn Tri Hành hay Thẩm Cẩm Thư. Trước mắt tôi trôi nổi một giao diện bán trong suốt méo mó, nhấp nháy những dòng mã nguồn gãy khúc.\n\nTôi nằm giữa khoảng không vô định ấy, lặng lẽ nhìn những dòng ký tự xanh lam lạnh lẽo. Không có hướng dẫn viên, không có nhiệm vụ rõ ràng, không có phần thưởng. Tôi chỉ là một mảnh vụn dữ liệu bị lỗi văng ra khỏi guồng quay luân hồi.\n\nKý ức về Tô Thanh Lạc, về cơn mưa Thượng Hải, về căn phòng net tồi tàn và những đứa trẻ ở Vạn Yên bỗng chốc mờ nhạt dần, tựa như một lớp sương mù dày đặc phủ lên tấm gương soi. Tôi biết mình từng sống, từng đau, từng tích lũy vô vàn tri thức qua hàng ngàn năm tháng lưu lạc, nhưng gương mặt của những người từng đi qua đời tôi lại biến thành những mảng màu nhòe nhoẹt.`,
+            createdAt: "2026-10-09",
+            updatedAt: "2026-10-09",
+            wordCount: 196,
+            authorNote: "Khởi đầu của một hành trình mới. Cảm ơn bạn đã đọc!"
+          }
+        ]
+      }
+    ];
+
+    let novels = JSON.parse(localStorage.getItem('my_novels_library_db')) || initialNovels;
+    let userProfile = JSON.parse(localStorage.getItem('my_cyber_profile')) || {
+      name: "Kẻ Lang Bạt",
+      exp: 40,
+      level: 1
+    };
+
+    novels.forEach(n => { if (!n.characters) n.characters = []; });
+
+    let selectedNovelIndex = 0;
+    let selectedChapterIndex = 0;
+    let isEditingStory = false;
+    let editingChapterIndex = null;
+    let editingCharIndex = null;
+    let isReversedOrder = false;
+    let currentFilter = "ALL";
+    let isZen = false;
+
+    // LƯU & ĐỒNG BỘ ĐÁM MÂY
+    function saveDB() {
+      localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
+      localStorage.setItem('my_cyber_profile', JSON.stringify(userProfile));
+      updatePhoneUI();
+
+      const indicator = document.getElementById('cloud-indicator');
+      if (indicator) indicator.textContent = "☁️ Đang lưu...";
+
+      docRef.set({
+        novels: novels,
+        userProfile: userProfile,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true })
+      .then(() => {
+        if (indicator) indicator.textContent = "☁️ Đã lưu đám mây";
+      })
+      .catch((err) => {
+        console.warn("Lưu đám mây thất bại:", err);
+        if (indicator) indicator.textContent = "⚠️ Lưu offline";
+      });
+    }
+
+    // LẮNG NGHE THỜI GIAN THỰC (REAL-TIME LISTENER)
+    docRef.onSnapshot((doc) => {
+      const indicator = document.getElementById('cloud-indicator');
+      if (doc.exists) {
+        const data = doc.data();
+        if (data.novels && Array.isArray(data.novels) && data.novels.length > 0) {
+          novels = data.novels;
+          novels.forEach(n => { if (!n.characters) n.characters = []; });
+          if (data.userProfile) userProfile = data.userProfile;
+          localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
+          localStorage.setItem('my_cyber_profile', JSON.stringify(userProfile));
+          renderHome();
+        }
+        if (indicator) indicator.textContent = "☁️ Đã kết nối đám mây";
+      } else {
+        saveDB();
+      }
+    }, (err) => {
+      console.warn("Lỗi kết nối Firestore:", err);
+      const indicator = document.getElementById('cloud-indicator');
+      if (indicator) indicator.textContent = "⚠️ Offline mode";
+      renderHome();
+    });
+
+    function addExp(amount) {
+      userProfile.exp += amount;
+      const expNeeded = userProfile.level * 100;
+      if (userProfile.exp >= expNeeded) {
+        userProfile.exp -= expNeeded;
+        userProfile.level += 1;
+        playLevelUpSound();
+        alert(`🎉 Thăng cấp! Bạn đã đạt LEVEL ${userProfile.level}!`);
+      }
+      saveDB();
+    }
+
+    function countWords(str) {
+      return (str || "").trim().split(/\s+/).filter(Boolean).length;
+    }
+
+    function getNovelTotalWords(novel) {
+      return (novel.chapters || []).reduce((acc, ch) => acc + (ch.wordCount || countWords(ch.content)), 0);
+    }
+
+    // TỦ TRUYỆN
+    function renderHome() {
+      const container = document.getElementById('novel-grid-container');
+      container.innerHTML = "";
+
+      const filtered = novels.filter(n => currentFilter === "ALL" || n.status === currentFilter);
+
+      filtered.forEach((novel) => {
+        const originalIndex = novels.indexOf(novel);
+        const totalWords = getNovelTotalWords(novel);
+        const card = document.createElement('div');
+        card.className = 'novel-card';
+        card.onclick = () => { playClickSound(); openCover(originalIndex); };
+
+        card.innerHTML = `
+          <div class="novel-cover">
+            <div style="font-size: 26px; margin-bottom: 6px;">📕</div>
+            <span>${novel.chapters.length} CHƯƠNG</span>
+            <span style="font-size:9px; opacity:0.8; margin-top:4px;">${totalWords} TỪ</span>
+          </div>
+          <div class="novel-info">
+            <div>
+              <div class="novel-badges">
+                <span class="tag tag-status">${escapeHtml(novel.status || "Đang ra")}</span>
+                <span class="tag">${escapeHtml(novel.genre || "Tiểu thuyết")}</span>
+              </div>
+              <div class="novel-title">${escapeHtml(novel.title)}</div>
+              <div class="novel-desc">${escapeHtml(novel.desc || novel.title)}</div>
+            </div>
+            <div class="novel-meta">
+              <span>Tác giả: ${escapeHtml(novel.author || userProfile.name)}</span>
+              <span>Đọc ngay ➔</span>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      updatePhoneUI();
+    }
+
+    function filterStatus(status, btn) {
+      currentFilter = status;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderHome();
+    }
+
+    // TRANG BÌA & MỤC LỤC
+    function openCover(idx) {
+      selectedNovelIndex = idx;
+      const novel = novels[idx];
+
+      document.getElementById('home-view').style.display = 'none';
+      document.getElementById('reader-view').style.display = 'none';
+      document.getElementById('cover-view').style.display = 'block';
+
+      document.getElementById('book-title').textContent = novel.title;
+      document.getElementById('cover-art-title').textContent = novel.title;
+      document.getElementById('cover-art-genre').textContent = novel.genre || "Tác Phẩm Gốc";
+      document.getElementById('book-author').textContent = novel.author || userProfile.name;
+      document.getElementById('book-status').textContent = novel.status || "Đang ra";
+      document.getElementById('book-chapter-count').textContent = `${novel.chapters.length} chương`;
+      document.getElementById('book-word-count').textContent = `${getNovelTotalWords(novel)} chữ`;
+      document.getElementById('book-desc').textContent = novel.desc || "Chưa có tóm tắt.";
+
+      const intro = novel.introData || {};
+      document.getElementById('intro-box-title').textContent = `◆ ${intro.title || "VĂN ÁN // GLITCH RECORD"}`;
+      document.getElementById('intro-box-code').textContent = intro.code || "SYS_INITIALIZED";
+      document.getElementById('book-intro').textContent = intro.text || novel.intro || "[ Không có dữ liệu văn án ]";
+
+      // CHỈ NHỚ CHƯƠNG VÀ VỊ TRÍ CỦA CHƯƠNG CUỐI CÙNG
+      const bookmark = JSON.parse(localStorage.getItem(`bookmark_${novel.id}`));
+      const resumeBtn = document.getElementById('btn-resume-reading');
+      const lastIndex = novel.chapters ? novel.chapters.length - 1 : -1;
+
+      if (bookmark && lastIndex >= 0 && bookmark.chIdx === lastIndex && novel.chapters[lastIndex]) {
+        resumeBtn.style.display = 'inline-block';
+        resumeBtn.textContent = `▶ Đọc tiếp (${novel.chapters[lastIndex].title})`;
+      } else {
+        resumeBtn.style.display = 'none';
+      }
+
+      renderChapterIndex();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resumeLastReading() {
+      const novel = novels[selectedNovelIndex];
+      const bookmark = JSON.parse(localStorage.getItem(`bookmark_${novel.id}`));
+      const lastIndex = novel.chapters ? novel.chapters.length - 1 : -1;
+      if (bookmark && bookmark.chIdx === lastIndex) {
+        readChapter(lastIndex, bookmark.scrollTop);
+      }
+    }
+
+    function renderChapterIndex() {
+      const novel = novels[selectedNovelIndex];
+      const chContainer = document.getElementById('chapter-list-container');
+      chContainer.innerHTML = "";
+
+      if (novel.chapters.length === 0) {
+        chContainer.innerHTML = `<div style="color: var(--text-dim); font-size: 14px;">Chưa có chương nào. Hãy bấm "+ Viết chương mới"!</div>`;
+        return;
+      }
+
+      let list = novel.chapters.map((ch, idx) => ({ ...ch, originalIdx: idx }));
+      if (isReversedOrder) list.reverse();
+
+      list.forEach((ch) => {
+        const item = document.createElement('div');
+        item.className = 'chapter-item';
+        item.innerHTML = `
+          <div class="chapter-name-click" onclick="playClickSound(); readChapter(${ch.originalIdx})">
+            <div>${escapeHtml(ch.title)}</div>
+            <div style="font-size:11px; color:var(--text-dim);">${ch.wordCount || countWords(ch.content)} từ • ${ch.updatedAt || 'Mới'}</div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn" style="padding: 3px 8px; font-size: 11px;" onclick="openEditChapterModal(${ch.originalIdx})">Sửa</button>
+            <button class="btn btn-danger" style="padding: 3px 8px; font-size: 11px;" onclick="deleteChapter(${ch.originalIdx})">Xóa</button>
+          </div>
+        `;
+        chContainer.appendChild(item);
+      });
+    }
+
+    function toggleChapterOrder() {
+      isReversedOrder = !isReversedOrder;
+      renderChapterIndex();
+    }
+
+    function deleteCurrentNovel() {
+      if (confirm(`Bạn có chắc muốn xóa vĩnh viễn tác phẩm "${novels[selectedNovelIndex].title}" không?`)) {
+        novels.splice(selectedNovelIndex, 1);
+        saveDB();
+        goHome();
+      }
+    }
+
+    // TRÌNH ĐỌC TRUYỆN
+    function readChapter(chIdx, scrollPos = 0) {
+      selectedChapterIndex = chIdx;
+      const novel = novels[selectedNovelIndex];
+      const ch = novel.chapters[chIdx];
+
+      document.getElementById('cover-view').style.display = 'none';
+      document.getElementById('reader-view').style.display = 'block';
+
+      document.getElementById('reader-book-name').textContent = novel.title;
+      document.getElementById('reader-ch-title').textContent = ch.title;
+
+      const wCount = ch.wordCount || countWords(ch.content);
+      const estMinutes = Math.max(1, Math.round(wCount / 250));
+      document.getElementById('reader-ch-time').textContent = `⏱ Khoảng ${estMinutes} phút đọc (${wCount} từ)`;
+
+      const paragraphs = ch.content.split('\n').filter(p => p.trim() !== "");
+      const contentEl = document.getElementById('reader-content');
+      contentEl.innerHTML = "";
+      paragraphs.forEach(p => {
+        const pTag = document.createElement('p');
+        pTag.textContent = p.trim();
+        contentEl.appendChild(pTag);
+      });
+
+      const noteBox = document.getElementById('reader-author-note-box');
+      if (ch.authorNote && ch.authorNote.trim()) {
+        noteBox.style.display = 'block';
+        document.getElementById('reader-author-note-content').textContent = ch.authorNote;
+      } else {
+        noteBox.style.display = 'none';
+      }
+
+      document.getElementById('btn-prev-ch').style.visibility = (chIdx > 0) ? 'visible' : 'hidden';
+      document.getElementById('btn-next-ch').style.visibility = (chIdx < novel.chapters.length - 1) ? 'visible' : 'hidden';
+
+      addExp(5);
+
+      setTimeout(() => {
+        window.scrollTo({ top: scrollPos, behavior: scrollPos ? 'smooth' : 'auto' });
+      }, 50);
+    }
+
+    function prevChapter() { if (selectedChapterIndex > 0) readChapter(selectedChapterIndex - 1); }
+    function nextChapter() {
+      const novel = novels[selectedNovelIndex];
+      if (selectedChapterIndex < novel.chapters.length - 1) readChapter(selectedChapterIndex + 1);
+    }
+
+    // CHỈ LƯU VỊ TRÍ CHO DUY NHẤT CHƯƠNG CUỐI CÙNG
+    window.addEventListener('scroll', () => {
+      if (document.getElementById('reader-view').style.display === 'block') {
+        const winScroll = document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        document.getElementById('reading-bar').style.width = scrolled + '%';
+
+        const novel = novels[selectedNovelIndex];
+        if (novel && novel.chapters && novel.chapters.length > 0) {
+          const lastChapterIndex = novel.chapters.length - 1;
+
+          if (selectedChapterIndex === lastChapterIndex) {
+            localStorage.setItem(`bookmark_${novel.id}`, JSON.stringify({
+              chIdx: lastChapterIndex,
+              scrollTop: winScroll
+            }));
+          }
+        }
+      } else {
+        document.getElementById('reading-bar').style.width = '0%';
+      }
+    });
+
+    // PHÍM TẮT ĐIỀU HƯỚNG
+    window.addEventListener('keydown', (e) => {
+      if (document.getElementById('reader-view').style.display === 'block') {
+        if (e.key === 'ArrowLeft') prevChapter();
+        if (e.key === 'ArrowRight') nextChapter();
+      }
+      if (e.key === 'p' || e.key === 'P') {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+          togglePhone();
+        }
+      }
+      if (e.key === 'Escape') {
+        closeModals();
+        if (isZen) toggleZenMode();
+      }
+    });
+
+    function goHome() {
+      document.getElementById('cover-view').style.display = 'none';
+      document.getElementById('reader-view').style.display = 'none';
+      document.getElementById('home-view').style.display = 'block';
+      renderHome();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function goCover() { openCover(selectedNovelIndex); }
+
+    // ZEN MODE & SOẠN THẢO
+    function toggleZenMode() {
+      isZen = !isZen;
+      const modal = document.getElementById('chapter-modal-card');
+      modal.classList.toggle('zen-active', isZen);
+    }
+
+    function onChapterInput() {
+      updateWordCountPreview();
+      const content = document.getElementById('chapter-modal-content').value;
+      const title = document.getElementById('chapter-modal-title').value;
+      localStorage.setItem('my_auto_draft', JSON.stringify({ title, content, time: Date.now() }));
+    }
+
+    function openStoryModal() {
+      isEditingStory = false;
+      document.getElementById('story-modal-heading').textContent = "THÊM TÁC PHẨM MỚI";
+      document.getElementById('story-modal-title').value = '';
+      document.getElementById('story-modal-genre').value = '';
+      document.getElementById('story-modal-status').value = 'Đang ra';
+      document.getElementById('story-modal-desc').value = '';
+      document.getElementById('story-modal-intro').value = '';
+      document.getElementById('story-modal').style.display = 'flex';
+    }
+
+    function openEditStoryModal() {
+      isEditingStory = true;
+      const current = novels[selectedNovelIndex];
+      document.getElementById('story-modal-heading').textContent = "CHỈNH SỬA TÁC PHẨM";
+      document.getElementById('story-modal-title').value = current.title;
+      document.getElementById('story-modal-genre').value = current.genre || '';
+      document.getElementById('story-modal-status').value = current.status || 'Đang ra';
+      document.getElementById('story-modal-desc').value = current.desc || '';
+      document.getElementById('story-modal-intro').value = current.introData ? current.introData.text : (current.intro || '');
+      document.getElementById('story-modal').style.display = 'flex';
+    }
+
+    function saveStoryModal() {
+      const title = document.getElementById('story-modal-title').value.trim();
+      const genre = document.getElementById('story-modal-genre').value.trim();
+      const status = document.getElementById('story-modal-status').value;
+      const desc = document.getElementById('story-modal-desc').value.trim();
+      const introText = document.getElementById('story-modal-intro').value.trim();
+
+      if (!title) { alert("Vui lòng nhập tên truyện!"); return; }
+
+      if (isEditingStory) {
+        const cur = novels[selectedNovelIndex];
+        cur.title = title;
+        cur.genre = genre;
+        cur.status = status;
+        cur.desc = desc;
+        cur.introData = {
+          title: "VĂN ÁN // GLITCH RECORD",
+          code: "SYS_UPDATED",
+          text: introText
+        };
+        saveDB();
+        closeModals();
+        openCover(selectedNovelIndex);
+      } else {
+        novels.unshift({
+          id: "novel-" + Date.now(),
+          title,
+          author: userProfile.name,
+          genre: genre || "Chưa phân loại",
+          status,
+          desc,
+          coverStyle: "default",
+          introData: {
+            title: "VĂN ÁN // GLITCH RECORD",
+            code: "SYS_ERR_0x000F89",
+            text: introText
+          },
+          characters: [],
+          chapters: []
+        });
+        addExp(25);
+        saveDB();
+        closeModals();
+        renderHome();
+      }
+    }
+
+    function openCreateChapterModal() {
+      editingChapterIndex = null;
+      document.getElementById('chapter-modal-heading').textContent = "VIẾT CHƯƠNG MỚI";
+      
+      const draft = JSON.parse(localStorage.getItem('my_auto_draft'));
+      if (draft && draft.content && confirm("Phát hiện một bản thảo chưa lưu trước đó. Bạn có muốn khôi phục không?")) {
+        document.getElementById('chapter-modal-title').value = draft.title || '';
+        document.getElementById('chapter-modal-content').value = draft.content || '';
+      } else {
+        document.getElementById('chapter-modal-title').value = '';
+        document.getElementById('chapter-modal-content').value = '';
+      }
+
+      document.getElementById('chapter-modal-author-note').value = '';
+      updateWordCountPreview();
+
+      const currentNovel = novels[selectedNovelIndex];
+      const nextNum = (currentNovel.chapters ? currentNovel.chapters.length : 0) + 1;
+      document.getElementById('chapter-modal-title').placeholder = `Ví dụ: Chương ${nextNum}: Tiêu đề chương`;
+
+      document.getElementById('chapter-modal').style.display = 'flex';
+    }
+
+    function openEditChapterModal(chIdx) {
+      editingChapterIndex = chIdx;
+      const ch = novels[selectedNovelIndex].chapters[chIdx];
+      document.getElementById('chapter-modal-heading').textContent = `CHỈNH SỬA: ${ch.title}`;
+      document.getElementById('chapter-modal-title').value = ch.title;
+      document.getElementById('chapter-modal-content').value = ch.content;
+      document.getElementById('chapter-modal-author-note').value = ch.authorNote || '';
+      updateWordCountPreview();
+      document.getElementById('chapter-modal').style.display = 'flex';
+    }
+
+    function editCurrentReadingChapter() { openEditChapterModal(selectedChapterIndex); }
+
+    function updateWordCountPreview() {
+      const text = document.getElementById('chapter-modal-content').value;
+      document.getElementById('ch-word-preview').textContent = `${countWords(text)} từ`;
+    }
+
+    function saveChapterModal() {
+      const title = document.getElementById('chapter-modal-title').value.trim();
+      const content = document.getElementById('chapter-modal-content').value.trim();
+      const authorNote = document.getElementById('chapter-modal-author-note').value.trim();
+
+      if (!title || !content) { alert("Vui lòng điền đủ tên chương và nội dung!"); return; }
+
+      const wordCount = countWords(content);
+      const nowStr = new Date().toISOString().slice(0, 10);
+
+      if (editingChapterIndex !== null) {
+        const ch = novels[selectedNovelIndex].chapters[editingChapterIndex];
+        ch.title = title;
+        ch.content = content;
+        ch.authorNote = authorNote;
+        ch.wordCount = wordCount;
+        ch.updatedAt = nowStr;
+
+        saveDB();
+        closeModals();
+        if (document.getElementById('reader-view').style.display === 'block') {
+          readChapter(editingChapterIndex);
+        } else {
+          openCover(selectedNovelIndex);
+        }
+      } else {
+        novels[selectedNovelIndex].chapters.push({
+          id: "ch-" + Date.now(),
+          title,
+          content,
+          createdAt: nowStr,
+          updatedAt: nowStr,
+          wordCount,
+          authorNote
+        });
+        addExp(35);
+        localStorage.removeItem('my_auto_draft');
+        saveDB();
+        closeModals();
+        openCover(selectedNovelIndex);
+      }
+    }
+
+    function deleteChapter(chIdx) {
+      if (confirm(`Bạn có chắc muốn xóa "${novels[selectedNovelIndex].chapters[chIdx].title}" không?`)) {
+        novels[selectedNovelIndex].chapters.splice(chIdx, 1);
+        saveDB();
+        openCover(selectedNovelIndex);
+      }
+    }
+
+    // SỔ TAY NHÂN VẬT THEO TỪNG TRUYỆN
+    function getSelectedCodexNovel() {
+      const selector = document.getElementById('codex-novel-selector');
+      const novelId = selector.value;
+      return novels.find(n => n.id === novelId) || novels[0];
+    }
+
+    function renderCodexDropdown() {
+      const selector = document.getElementById('codex-novel-selector');
+      selector.innerHTML = "";
+      novels.forEach((n, idx) => {
+        const opt = document.createElement('option');
+        opt.value = n.id;
+        opt.textContent = `${n.title} (${(n.characters || []).length} nhân vật)`;
+        if (idx === selectedNovelIndex) opt.selected = true;
+        selector.appendChild(opt);
+      });
+    }
+
+    function renderCodexList() {
+      const novel = getSelectedCodexNovel();
+      const container = document.getElementById('codex-container');
+      container.innerHTML = "";
+
+      if (!novel || !novel.characters || novel.characters.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding: 20px 10px; color: #64748b; font-size: 11px;">Truyện này chưa có nhân vật nào trong sổ tay.<br>Bấm nút "+ Thêm" ở trên để ghi chép!</div>`;
+        return;
+      }
+
+      novel.characters.forEach((c, idx) => {
+        const div = document.createElement('div');
+        div.className = 'character-card';
+        div.innerHTML = `
+          <div style="font-size: 20px; line-height: 1;">👤</div>
+          <div style="flex:1;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size: 12px; font-weight: bold; color: var(--neon);">${escapeHtml(c.name)}</span>
+              <span style="font-size: 9px; color: var(--text-dim);">[${escapeHtml(c.role || 'Chưa rõ')}]</span>
+            </div>
+            <div style="font-size: 10px; color: #ef4444; margin-top:2px;">Trạng thái: ${escapeHtml(c.status || 'Chưa cập nhật')}</div>
+            <div style="font-size: 10px; color: #94a3b8; margin-top:2px; line-height:1.4;">${escapeHtml(c.note || '')}</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <button class="btn" style="padding: 2px 6px; font-size: 9px;" onclick="openEditCharacterModal(${idx})">Sửa</button>
+            <button class="btn btn-danger" style="padding: 2px 6px; font-size: 9px;" onclick="deleteCharacterFromCodex(${idx})">Xóa</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function openAddCharacterModal() {
+      const novel = getSelectedCodexNovel();
+      if (!novel) { alert("Vui lòng tạo truyện trước!"); return; }
+
+      editingCharIndex = null;
+      document.getElementById('char-modal-heading').textContent = `THÊM NHÂN VẬT - [${novel.title}]`;
+      document.getElementById('char-input-name').value = '';
+      document.getElementById('char-input-role').value = '';
+      document.getElementById('char-input-status').value = 'Còn sống';
+      document.getElementById('char-input-note').value = '';
+      document.getElementById('char-modal').style.display = 'flex';
+    }
+
+    function openEditCharacterModal(idx) {
+      const novel = getSelectedCodexNovel();
+      editingCharIndex = idx;
+      const c = novel.characters[idx];
+
+      document.getElementById('char-modal-heading').textContent = `CHỈNH SỬA: ${c.name}`;
+      document.getElementById('char-input-name').value = c.name;
+      document.getElementById('char-input-role').value = c.role || '';
+      document.getElementById('char-input-status').value = c.status || '';
+      document.getElementById('char-input-note').value = c.note || '';
+      document.getElementById('char-modal').style.display = 'flex';
+    }
+
+    function saveCharacterModal() {
+      const novel = getSelectedCodexNovel();
+      const name = document.getElementById('char-input-name').value.trim();
+      const role = document.getElementById('char-input-role').value.trim();
+      const status = document.getElementById('char-input-status').value.trim();
+      const note = document.getElementById('char-input-note').value.trim();
+
+      if (!name) { alert("Vui lòng nhập tên nhân vật!"); return; }
+
+      if (!novel.characters) novel.characters = [];
+
+      if (editingCharIndex !== null) {
+        novel.characters[editingCharIndex] = {
+          ...novel.characters[editingCharIndex],
+          name, role, status, note
+        };
+      } else {
+        novel.characters.push({
+          id: "char-" + Date.now(),
+          name, role, status, note
+        });
+      }
+
+      saveDB();
+      closeModals();
+      renderCodexDropdown();
+      renderCodexList();
+    }
+
+    function deleteCharacterFromCodex(idx) {
+      const novel = getSelectedCodexNovel();
+      if (confirm(`Bạn có chắc muốn xóa nhân vật "${novel.characters[idx].name}" khỏi sổ tay?`)) {
+        novel.characters.splice(idx, 1);
+        saveDB();
+        renderCodexDropdown();
+        renderCodexList();
+      }
+    }
+
+    function closeModals() {
+      document.getElementById('story-modal').style.display = 'none';
+      document.getElementById('chapter-modal').style.display = 'none';
+      document.getElementById('char-modal').style.display = 'none';
+      if (isZen) toggleZenMode();
+    }
+
+    // CYBER PHONE LOGIC
+    function togglePhone() {
+      const phone = document.getElementById('cyber-phone');
+      phone.style.display = (phone.style.display === 'flex') ? 'none' : 'flex';
+      playClickSound();
+      if (phone.style.display === 'flex') updatePhoneUI();
+    }
+
+    function phoneHome() {
+      playClickSound();
+      document.querySelectorAll('.phone-sub-app').forEach(el => el.style.display = 'none');
+      document.getElementById('phone-home-screen').style.display = 'flex';
+    }
+
+    function openPhoneApp(appName) {
+      playClickSound();
+      document.getElementById('phone-home-screen').style.display = 'none';
+      document.querySelectorAll('.phone-sub-app').forEach(el => el.style.display = 'none');
+      document.getElementById(`phone-app-${appName}`).style.display = 'flex';
+
+      if (appName === 'codex') {
+        renderCodexDropdown();
+        renderCodexList();
+      }
+    }
+
+    function updatePhoneUI() {
+      const expNeeded = userProfile.level * 100;
+      const percent = Math.min(100, Math.round((userProfile.exp / expNeeded) * 100));
+      document.getElementById('phone-level-display').textContent = `LV.${userProfile.level} - Tác Giả Ảo`;
+      document.getElementById('phone-exp-fill').style.width = `${percent}%`;
+      document.getElementById('phone-exp-text').textContent = `EXP: ${userProfile.exp} / ${expNeeded}`;
+
+      document.getElementById('profile-name').textContent = userProfile.name;
+      document.getElementById('stat-novels').textContent = novels.length;
+
+      let totalCh = 0;
+      let totalW = 0;
+      novels.forEach(n => {
+        totalCh += (n.chapters ? n.chapters.length : 0);
+        totalW += getNovelTotalWords(n);
+      });
+      document.getElementById('stat-chapters').textContent = totalCh;
+      document.getElementById('stat-total-words').textContent = totalW;
+
+      const badgesContainer = document.getElementById('badges-container');
+      badgesContainer.innerHTML = "";
+      const badgesList = [
+        { icon: "🌱", name: "Người Sáng Tạo", desc: "Tạo tác phẩm đầu tiên", unlocked: novels.length >= 1 },
+        { icon: "🚀", name: "Kẻ Lang Bạt", desc: "Đạt cấp độ Level 2", unlocked: userProfile.level >= 2 },
+        { icon: "📖", name: "Mọt Sách", desc: "Đọc tích lũy 5 lượt", unlocked: userProfile.exp >= 50 },
+        { icon: "⚡", name: "Thần Tốc", desc: "Viết trên 3 chương truyện", unlocked: totalCh >= 3 },
+        { icon: "👑", name: "Đại Thần Ký Tự", desc: "Tổng cộng trên 1000 từ", unlocked: totalW >= 1000 }
+      ];
+
+      badgesList.forEach(b => {
+        const div = document.createElement('div');
+        div.className = `badge-card ${b.unlocked ? 'badge-unlocked' : ''}`;
+        div.innerHTML = `
+          <div style="font-size: 22px;">${b.icon}</div>
+          <div style="flex:1;">
+            <div style="font-size: 12px; font-weight: bold; color: ${b.unlocked ? 'var(--neon)' : '#64748b'};">${b.name}</div>
+            <div style="font-size: 10px; color: #64748b;">${b.desc}</div>
+          </div>
+          <div style="font-size: 10px; color: ${b.unlocked ? '#10b981' : '#475569'};">${b.unlocked ? 'Mở' : 'Khóa'}</div>
+        `;
+        badgesContainer.appendChild(div);
+      });
+    }
+
+    function changeAuthorName() {
+      const newName = prompt("Nhập bút danh mới:", userProfile.name);
+      if (newName && newName.trim()) {
+        userProfile.name = newName.trim();
+        saveDB();
+        renderHome();
+      }
+    }
+
+    function setReadingFontSize(size) {
+      document.documentElement.style.setProperty('--read-size', size + 'px');
+      playClickSound();
+    }
+
+    function setReadingFont(type) {
+      const font = (type === 'serif') ? "Georgia, 'Times New Roman', serif" : "'Segoe UI', -apple-system, Roboto, sans-serif";
+      document.documentElement.style.setProperty('--font-reading', font);
+      playClickSound();
+    }
+
+    function setTheme(theme) {
+      document.body.className = '';
+      if (theme === 'warm') document.body.classList.add('theme-warm');
+      if (theme === 'oled') document.body.classList.add('theme-oled');
+      playClickSound();
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ novels, userProfile }));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `cyber_novel_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (imported.novels) {
+            novels = imported.novels;
+            novels.forEach(n => { if (!n.characters) n.characters = []; });
+            if (imported.userProfile) userProfile = imported.userProfile;
+            saveDB();
+            renderHome();
+            alert("Đã khôi phục toàn bộ tác phẩm và sổ tay thành công!");
+          }
+        } catch(err) {
+          alert("Tệp sao lưu không hợp lệ!");
+        }
+      };
+      reader.readAsText(event.target.files[0]);
+    }
+
+    function escapeHtml(str) {
+      return (str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    renderHome();
+  </script>
+</body>
+</html>
