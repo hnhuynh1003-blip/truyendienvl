@@ -124,6 +124,8 @@
     }
     .btn:hover, .btn:active { background: var(--accent); color: #0b0c10; }
     .btn-primary { background: var(--accent); color: #0b0c10; font-weight: 600; }
+    .btn-gold { background: var(--gold); border-color: var(--gold); color: #0b0c10; font-weight: 600; }
+    .btn-gold:hover { background: #d97706; border-color: #d97706; color: #fff; }
     .btn-danger { border-color: var(--red); color: var(--red); }
     .btn-danger:hover { background: var(--red); color: #fff; }
 
@@ -293,7 +295,7 @@
     }
     .novel-card:hover { border-color: var(--accent); transform: translateY(-3px); }
 
-    /* BÌA TRUYỆN TRANG CHỦ (ĐÃ XÓA SẠCH CHỮ VÀ ICON ĐÈ LÊN) */
+    /* BÌA TRUYỆN TRANG CHỦ (SẠCH SẼ HOÀN TOÀN) */
     .novel-cover {
       width: 110px;
       min-width: 110px;
@@ -333,7 +335,6 @@
     }
     @media (min-width: 600px) { .book-cover-banner { flex-direction: row; align-items: center; } }
 
-    /* BÌA TRONG TRANG MỤC LỤC (SẠCH SẼ 100%) */
     .book-cover-art {
       width: 145px; height: 210px; min-width: 145px; margin: 0 auto;
       border: 2px solid var(--neon); border-radius: 8px;
@@ -608,14 +609,14 @@
       <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
         <button class="btn" onclick="goHome()">‹ Về Tủ Truyện</button>
         <div style="display: flex; gap: 8px;">
-          <button class="btn btn-primary" id="btn-resume-reading" style="display:none;" onclick="resumeLastReading()">▶ Đọc tiếp</button>
+          <!-- NÚT ĐỌC THÔNG MINH TRÊN TRANG BÌA -->
+          <button class="btn btn-gold" id="btn-main-reading-action" onclick="smartReadActionCover()">▶ Đọc ngay</button>
           <button class="btn admin-only" onclick="openEditStoryModal()">✎ Sửa truyện</button>
           <button class="btn btn-danger admin-only" onclick="deleteCurrentNovel()">Xóa truyện</button>
         </div>
       </div>
 
       <div class="book-cover-banner">
-        <!-- BÌA TRONG TRANG BÌA SẠCH SẼ HOÀN TOÀN -->
         <div class="book-cover-art" id="book-cover-art-container"></div>
 
         <div class="book-banner-meta">
@@ -881,7 +882,7 @@
       </div>
       <div class="modal-field">
         <label>Thể loại / Tags (Ngăn cách bằng dấu phẩy):</label>
-        <input type="text" id="story-modal-genre" placeholder="Vô hạn lưu, Hệ thống, Glitch, Kinh dị, Xuyên không...">
+        <input type="text" id="story-modal-genre" placeholder="Vô hạn lưu, Hệ thống, Glitch, Kinh dị, Xuyên nhanh...">
       </div>
       <div class="modal-field">
         <label>Trạng thái:</label>
@@ -1145,6 +1146,9 @@
       saveDB();
     }
 
+    // ==========================================
+    // CƠ CHẾ LƯU & ĐỒNG BỘ CHUẨN XÁC
+    // ==========================================
     function saveDB() {
       localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
       localStorage.setItem('my_cyber_profile', JSON.stringify(userProfile));
@@ -1176,16 +1180,33 @@
             if (!n.characters) n.characters = [];
             if (!n.updatedAt) n.updatedAt = "2026-10-09";
           });
-          if (data.userProfile) {
-            const curRole = userProfile.role;
-            userProfile = data.userProfile;
-            userProfile.role = curRole;
-            if (!userProfile.quests) userProfile.quests = DEFAULT_SYSTEM_QUESTS;
-          }
-          localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
-          localStorage.setItem('my_cyber_profile', JSON.stringify(userProfile));
-          renderHome();
         }
+
+        // Hợp nhất dữ liệu an toàn - chống đè mất cấp độ và xu
+        if (data.userProfile) {
+          const curRole = userProfile.role;
+          const cloudP = data.userProfile;
+
+          userProfile.name = cloudP.name || userProfile.name;
+          userProfile.title = cloudP.title || userProfile.title;
+          userProfile.level = Math.max(parseInt(userProfile.level) || 1, parseInt(cloudP.level) || 1);
+          userProfile.exp = Math.max(parseInt(userProfile.exp) || 0, parseInt(cloudP.exp) || 0);
+          userProfile.currency = Math.max(parseInt(userProfile.currency) || 0, parseInt(cloudP.currency) || 0);
+          userProfile.role = curRole;
+
+          if (cloudP.inventory && Array.isArray(cloudP.inventory)) {
+            userProfile.inventory = cloudP.inventory;
+          }
+          if (cloudP.quests && Array.isArray(cloudP.quests)) {
+            userProfile.quests = cloudP.quests;
+          }
+        }
+
+        localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
+        localStorage.setItem('my_cyber_profile', JSON.stringify(userProfile));
+        renderHome();
+        updatePhoneUI();
+
         if (indicator) indicator.textContent = "☁️ Đã kết nối đám mây";
       } else {
         saveDB();
@@ -1194,7 +1215,76 @@
       const indicator = document.getElementById('cloud-indicator');
       if (indicator) indicator.textContent = "⚠️ Offline mode";
       renderHome();
+      updatePhoneUI();
     });
+
+    // CẬP NHẬT GIAO DIỆN HỆ THỐNG PHONE AN TOÀN
+    function updatePhoneUI() {
+      userProfile.level = Math.max(1, parseInt(userProfile.level) || 1);
+      userProfile.exp = Math.max(0, parseInt(userProfile.exp) || 0);
+      userProfile.currency = Math.max(0, parseInt(userProfile.currency) || 0);
+
+      const expNeeded = userProfile.level * 100;
+      const percent = Math.min(100, Math.round((userProfile.exp / expNeeded) * 100));
+
+      const levelEl = document.getElementById('phone-level-display');
+      if (levelEl) levelEl.textContent = `LV.${userProfile.level} - ${userProfile.title || 'Kẻ Lang Bạt'}`;
+
+      const fillEl = document.getElementById('phone-exp-fill');
+      if (fillEl) fillEl.style.width = `${percent}%`;
+
+      const expTextEl = document.getElementById('phone-exp-text');
+      if (expTextEl) expTextEl.textContent = `EXP: ${userProfile.exp} / ${expNeeded}`;
+
+      const coinEl = document.getElementById('phone-currency-display');
+      if (coinEl) coinEl.textContent = `🪙 ${userProfile.currency} Xu`;
+
+      const shopCoinEl = document.getElementById('shop-currency-val');
+      if (shopCoinEl) shopCoinEl.textContent = userProfile.currency;
+
+      const profNameEl = document.getElementById('profile-name');
+      if (profNameEl) profNameEl.textContent = userProfile.name || 'Kẻ Lang Bạt';
+
+      const profTitleEl = document.getElementById('profile-title');
+      if (profTitleEl) profTitleEl.textContent = userProfile.title || 'Người Thao Túng Mã Nguồn';
+
+      const statNovelsEl = document.getElementById('stat-novels');
+      if (statNovelsEl) statNovelsEl.textContent = novels.length;
+
+      let totalCh = 0;
+      let totalW = 0;
+      novels.forEach(n => {
+        totalCh += (n.chapters ? n.chapters.length : 0);
+        totalW += getNovelTotalWords(n);
+      });
+      const statChEl = document.getElementById('stat-chapters');
+      if (statChEl) statChEl.textContent = totalCh;
+
+      const statWEl = document.getElementById('stat-total-words');
+      if (statWEl) statWEl.textContent = totalW;
+    }
+
+    function addExp(amount) {
+      amount = parseInt(amount) || 0;
+      userProfile.exp = (parseInt(userProfile.exp) || 0) + amount;
+
+      let leveledUp = false;
+      let expNeeded = (parseInt(userProfile.level) || 1) * 100;
+
+      while (userProfile.exp >= expNeeded) {
+        userProfile.exp -= expNeeded;
+        userProfile.level = (parseInt(userProfile.level) || 1) + 1;
+        userProfile.currency = (parseInt(userProfile.currency) || 0) + 30;
+        expNeeded = userProfile.level * 100;
+        leveledUp = true;
+      }
+
+      if (leveledUp) {
+        showSystemAlert("THĂNG CẤP THỰC THỂ!", `Đạt LEVEL ${userProfile.level} (+30 Xu Thưởng)`);
+      }
+
+      saveDB();
+    }
 
     function advanceQuest(questId, amount = 1) {
       const q = userProfile.quests.find(item => item.id === questId);
@@ -1263,18 +1353,6 @@
       renderInventory();
     }
 
-    function addExp(amount) {
-      userProfile.exp += amount;
-      const expNeeded = userProfile.level * 100;
-      if (userProfile.exp >= expNeeded) {
-        userProfile.exp -= expNeeded;
-        userProfile.level += 1;
-        userProfile.currency += 30;
-        showSystemAlert("THĂNG CẤP THỰC THỂ!", `Đạt LEVEL ${userProfile.level} (+30 Xu Thưởng)`);
-      }
-      saveDB();
-    }
-
     function countWords(str) {
       return (str || "").trim().split(/\s+/).filter(Boolean).length;
     }
@@ -1291,7 +1369,6 @@
       return novel.updatedAt || "2026-10-09";
     }
 
-    // TỰ ĐỘNG THU NHỎ & NÉN ẢNH CANVAS CHỐNG CRASH FIREBASE
     function handleCoverFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1366,6 +1443,36 @@
       });
     }
 
+    // ==========================================
+    // CƠ CHẾ NÚT ĐỌC NGAY / ĐỌC TIẾP THÔNG MINH
+    // ==========================================
+    function smartReadAction(novelIdx, event) {
+      if (event) event.stopPropagation(); // Không kích hoạt click vào thân card
+
+      selectedNovelIndex = novelIdx;
+      const novel = novels[novelIdx];
+
+      if (!novel.chapters || novel.chapters.length === 0) {
+        alert("Tác phẩm này hiện chưa có chương nào!");
+        openCover(novelIdx);
+        return;
+      }
+
+      const bookmark = JSON.parse(localStorage.getItem(`bookmark_${novel.id}`));
+      
+      // Nếu có lịch sử đọc dở hợp lệ -> Đọc tiếp
+      if (bookmark && typeof bookmark.chIdx === 'number' && novel.chapters[bookmark.chIdx]) {
+        readChapter(bookmark.chIdx, bookmark.scrollTop || 0);
+      } else {
+        // Chưa từng đọc -> Đọc ngay chương 1
+        readChapter(0, 0);
+      }
+    }
+
+    function smartReadActionCover() {
+      smartReadAction(selectedNovelIndex);
+    }
+
     function renderHome() {
       renderTagCloud();
 
@@ -1425,7 +1532,17 @@
         const coverBg = novel.coverImage ? `background-image: url('${novel.coverImage}');` : '';
         const tagBadgesHtml = (novel.genre || "Tiểu thuyết").split(/[,/]+/).map(t => `<span class="tag">${escapeHtml(t.trim())}</span>`).join(" ");
 
-        // BÌA TRANG CHỦ HOÀN TOÀN SẠCH CHỮ VÀ BIỂU TƯỢNG SÁCH
+        // Kiểm tra xem đã từng đọc truyện này chưa
+        const bookmark = JSON.parse(localStorage.getItem(`bookmark_${novel.id}`));
+        let readButtonText = "▶ Đọc ngay";
+        let readButtonClass = "btn btn-primary";
+
+        if (bookmark && typeof bookmark.chIdx === 'number' && novel.chapters && novel.chapters[bookmark.chIdx]) {
+          readButtonText = `⚡ Đọc tiếp (Ch.${bookmark.chIdx + 1})`;
+          readButtonClass = "btn btn-gold";
+        }
+
+        // BÌA TRANG CHỦ HOÀN TOÀN SẠCH CHỮ VÀ CÓ NÚT ĐỌC THÔNG MINH
         card.innerHTML = `
           <div class="novel-cover" style="${coverBg}"></div>
           <div class="novel-info">
@@ -1439,7 +1556,7 @@
             </div>
             <div class="novel-meta">
               <span style="color:var(--text-dim)">⏱ Cập nhật: <b>${latestDate}</b></span>
-              <span>Đọc ngay ➔</span>
+              <button class="${readButtonClass}" style="padding: 3px 10px; font-size: 11px;" onclick="smartReadAction(${originalIndex}, event)">${readButtonText}</button>
             </div>
           </div>
         `;
@@ -1490,28 +1607,20 @@
       document.getElementById('intro-box-code').textContent = intro.code || "SYS_INITIALIZED";
       document.getElementById('book-intro').textContent = intro.text || novel.intro || "[ Không có dữ liệu văn án ]";
 
+      // Cập nhật trạng thái nút đọc chính ở trang bìa
       const bookmark = JSON.parse(localStorage.getItem(`bookmark_${novel.id}`));
-      const resumeBtn = document.getElementById('btn-resume-reading');
-      const lastIndex = novel.chapters ? novel.chapters.length - 1 : -1;
+      const mainReadBtn = document.getElementById('btn-main-reading-action');
 
-      if (bookmark && lastIndex >= 0 && bookmark.chIdx === lastIndex && novel.chapters[lastIndex]) {
-        resumeBtn.style.display = 'inline-block';
-        resumeBtn.textContent = `▶ Đọc tiếp (${novel.chapters[lastIndex].title})`;
+      if (bookmark && typeof bookmark.chIdx === 'number' && novel.chapters && novel.chapters[bookmark.chIdx]) {
+        mainReadBtn.className = "btn btn-gold";
+        mainReadBtn.textContent = `⚡ Đọc tiếp (${novel.chapters[bookmark.chIdx].title})`;
       } else {
-        resumeBtn.style.display = 'none';
+        mainReadBtn.className = "btn btn-primary";
+        mainReadBtn.textContent = "▶ Đọc ngay (Chương 1)";
       }
 
       renderChapterIndex();
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function resumeLastReading() {
-      const novel = novels[selectedNovelIndex];
-      const bookmark = JSON.parse(localStorage.getItem(`bookmark_${novel.id}`));
-      const lastIndex = novel.chapters ? novel.chapters.length - 1 : -1;
-      if (bookmark && bookmark.chIdx === lastIndex) {
-        readChapter(lastIndex, bookmark.scrollTop);
-      }
     }
 
     function renderChapterIndex() {
@@ -1593,6 +1702,12 @@
       document.getElementById('btn-prev-ch').style.visibility = (chIdx > 0) ? 'visible' : 'hidden';
       document.getElementById('btn-next-ch').style.visibility = (chIdx < novel.chapters.length - 1) ? 'visible' : 'hidden';
 
+      // Lưu bookmark chương đang đọc
+      localStorage.setItem(`bookmark_${novel.id}`, JSON.stringify({
+        chIdx: chIdx,
+        scrollTop: scrollPos || 0
+      }));
+
       addExp(5);
       advanceQuest('q_daily_read', 1);
       if (chIdx === 0) advanceQuest('q_main_intro', 1);
@@ -1617,13 +1732,10 @@
 
         const novel = novels[selectedNovelIndex];
         if (novel && novel.chapters && novel.chapters.length > 0) {
-          const lastChapterIndex = novel.chapters.length - 1;
-          if (selectedChapterIndex === lastChapterIndex) {
-            localStorage.setItem(`bookmark_${novel.id}`, JSON.stringify({
-              chIdx: lastChapterIndex,
-              scrollTop: winScroll
-            }));
-          }
+          localStorage.setItem(`bookmark_${novel.id}`, JSON.stringify({
+            chIdx: selectedChapterIndex,
+            scrollTop: winScroll
+          }));
         }
       } else {
         document.getElementById('reading-bar').style.width = '0%';
@@ -1697,7 +1809,6 @@
       document.getElementById('story-modal').style.display = 'flex';
     }
 
-    // LƯU TÁC PHẨM ĐẢM BẢO KHÔNG LỖI ẢNH BÌA
     function saveStoryModal() {
       const title = document.getElementById('story-modal-title').value.trim();
       const coverUrlInput = document.getElementById('story-modal-cover-url').value.trim();
@@ -2151,28 +2262,6 @@
       showSystemAlert("GIAO DỊCH THÀNH CÔNG", `Đã mua: [${item.rank}] ${item.name} (-${item.price} Xu)`);
       saveDB();
       renderShop();
-    }
-
-    function updatePhoneUI() {
-      const expNeeded = userProfile.level * 100;
-      const percent = Math.min(100, Math.round((userProfile.exp / expNeeded) * 100));
-      document.getElementById('phone-level-display').textContent = `LV.${userProfile.level} - ${userProfile.title}`;
-      document.getElementById('phone-exp-fill').style.width = `${percent}%`;
-      document.getElementById('phone-exp-text').textContent = `EXP: ${userProfile.exp} / ${expNeeded}`;
-      document.getElementById('phone-currency-display').textContent = `🪙 ${userProfile.currency} Xu`;
-
-      document.getElementById('profile-name').textContent = userProfile.name;
-      document.getElementById('profile-title').textContent = userProfile.title;
-      document.getElementById('stat-novels').textContent = novels.length;
-
-      let totalCh = 0;
-      let totalW = 0;
-      novels.forEach(n => {
-        totalCh += (n.chapters ? n.chapters.length : 0);
-        totalW += getNovelTotalWords(n);
-      });
-      document.getElementById('stat-chapters').textContent = totalCh;
-      document.getElementById('stat-total-words').textContent = totalW;
     }
 
     function changeAuthorName() {
