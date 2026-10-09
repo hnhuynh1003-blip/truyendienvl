@@ -137,7 +137,7 @@
       display: none !important;
     }
 
-    /* THANH TÌM KIẾM & BỘ LỌC NÂNG CAO */
+    /* BỘ LỌC TÌM KIẾM & TAG */
     .filter-panel {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -242,7 +242,7 @@
     .rank-SS { background: #e11d48; color: #fff; box-shadow: 0 0 8px #e11d48; }
     .rank-SSS { background: linear-gradient(90deg, #ec4899, #eab308, #06b6d4); color: #000; font-weight: 900; box-shadow: 0 0 10px #eab308; }
 
-    /* POP-UP THÔNG BÁO HỆ THỐNG */
+    /* THÔNG BÁO HỆ THỐNG */
     #system-alert-banner {
       display: none;
       position: fixed;
@@ -274,7 +274,7 @@
       100% { transform: translate(0); }
     }
 
-    /* NOVEL GRID */
+    /* DANH SÁCH TRUYỆN */
     .novel-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -293,36 +293,15 @@
     }
     .novel-card:hover { border-color: var(--accent); transform: translateY(-3px); }
 
+    /* BÌA TRUYỆN TRANG CHỦ (ĐÃ XÓA SẠCH CHỮ VÀ ICON ĐÈ LÊN) */
     .novel-cover {
       width: 110px;
       min-width: 110px;
       background-color: #111822;
       border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      text-align: center;
-      padding: 6px;
-      position: relative;
       background-size: cover !important;
       background-position: center !important;
       background-repeat: no-repeat !important;
-    }
-    .novel-cover-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(to top, rgba(10, 14, 20, 0.95), transparent);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: var(--neon);
-      font-size: 10px;
-      font-weight: bold;
-      padding: 6px 2px;
     }
 
     .novel-info {
@@ -354,26 +333,14 @@
     }
     @media (min-width: 600px) { .book-cover-banner { flex-direction: row; align-items: center; } }
 
+    /* BÌA TRONG TRANG MỤC LỤC (SẠCH SẼ 100%) */
     .book-cover-art {
       width: 145px; height: 210px; min-width: 145px; margin: 0 auto;
       border: 2px solid var(--neon); border-radius: 8px;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      padding: 12px; text-align: center; color: var(--neon);
       box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-      background-size: cover;
-      background-position: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .book-cover-art-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(10, 14, 20, 0.7);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 8px;
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
     }
 
     .book-banner-meta { flex: 1; }
@@ -648,13 +615,8 @@
       </div>
 
       <div class="book-cover-banner">
-        <div class="book-cover-art" id="book-cover-art-container">
-          <div class="book-cover-art-overlay">
-            <div style="font-size: 28px; margin-bottom: 4px;">📖</div>
-            <div style="font-size: 14px; font-weight: bold; line-height: 1.3;" id="cover-art-title">Tên Truyện</div>
-            <div style="font-size: 10px; opacity: 0.8; margin-top: 4px;" id="cover-art-genre">Vô hạn lưu</div>
-          </div>
-        </div>
+        <!-- BÌA TRONG TRANG BÌA SẠCH SẼ HOÀN TOÀN -->
+        <div class="book-cover-art" id="book-cover-art-container"></div>
 
         <div class="book-banner-meta">
           <h1 id="book-title">Tên Tác Phẩm</h1>
@@ -1013,7 +975,7 @@
     const db = firebase.firestore();
     const docRef = db.collection("studio_data").doc("main_library");
 
-    // ÂM THANH SYSTEM (Web Audio Synth)
+    // ÂM THANH SYNTH
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playTone(freq, duration, type = 'sine') {
       try {
@@ -1155,7 +1117,6 @@
     let editingCharIndex = null;
     let isReversedOrder = false;
     
-    // BIẾN QUẢN LÝ BỘ LỌC TÌM KIẾM
     let currentFilterStatus = "ALL";
     let selectedTag = "ALL";
     let searchQuery = "";
@@ -1235,7 +1196,6 @@
       renderHome();
     });
 
-    // TIẾN TRÌNH NHIỆM VỤ
     function advanceQuest(questId, amount = 1) {
       const q = userProfile.quests.find(item => item.id === questId);
       if (q && !q.claimed) {
@@ -1331,7 +1291,7 @@
       return novel.updatedAt || "2026-10-09";
     }
 
-   // 1. TỰ ĐỘNG THU NHỎ & NÉN ẢNH (CHỐNG LỖI BỘ NHỚ FIREBASE)
+    // TỰ ĐỘNG THU NHỎ & NÉN ẢNH CANVAS CHỐNG CRASH FIREBASE
     function handleCoverFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1340,7 +1300,6 @@
       reader.onload = function(e) {
         const img = new Image();
         img.onload = function() {
-          // Thu nhỏ kích thước ảnh vừa chuẩn bìa truyện (max width 360px)
           const canvas = document.createElement('canvas');
           const maxW = 360;
           const scale = Math.min(1, maxW / img.width);
@@ -1350,11 +1309,8 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          // Nén thành ảnh JPEG nhẹ (chất lượng 0.7, chỉ tốn ~30KB)
           const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
           document.getElementById('story-modal-cover-base64').value = compressedDataUrl;
-          
-          // Điền luôn vào ô link để bạn thấy ảnh đã sẵn sàng
           document.getElementById('story-modal-cover-url').value = "[Đã tải và nén ảnh thành công]";
         };
         img.src = e.target.result;
@@ -1362,9 +1318,6 @@
       reader.readAsDataURL(file);
     }
 
-    // ==========================================
-    // LOGIC TÌM KIẾM, LỌC THEO TAG & SẮP XẾP THỜI GIAN
-    // ==========================================
     function onSearchChange() {
       searchQuery = document.getElementById('search-novel-input').value.trim().toLowerCase();
       renderHome();
@@ -1413,17 +1366,14 @@
       });
     }
 
-    // TỦ TRUYỆN HIỂN THỊ DỮ LIỆU
     function renderHome() {
       renderTagCloud();
 
       const container = document.getElementById('novel-grid-container');
       container.innerHTML = "";
 
-      // 1. Lọc theo trạng thái
       let filtered = novels.filter(n => currentFilterStatus === "ALL" || n.status === currentFilterStatus);
 
-      // 2. Lọc theo tag
       if (selectedTag !== "ALL") {
         filtered = filtered.filter(n => {
           if (!n.genre) return false;
@@ -1432,7 +1382,6 @@
         });
       }
 
-      // 3. Lọc theo từ khóa tìm kiếm (Tên truyện, tóm tắt, tên nhân vật)
       if (searchQuery) {
         filtered = filtered.filter(n => {
           const matchTitle = (n.title || "").toLowerCase().includes(searchQuery);
@@ -1442,7 +1391,6 @@
         });
       }
 
-      // 4. Sắp xếp theo chế độ được chọn
       filtered.sort((a, b) => {
         const dateA = new Date(getNovelLatestDate(a)).getTime() || 0;
         const dateB = new Date(getNovelLatestDate(b)).getTime() || 0;
@@ -1469,25 +1417,17 @@
 
       filtered.forEach((novel) => {
         const originalIndex = novels.indexOf(novel);
-        const totalWords = getNovelTotalWords(novel);
         const latestDate = getNovelLatestDate(novel);
         const card = document.createElement('div');
         card.className = 'novel-card';
         card.onclick = () => openCover(originalIndex);
 
         const coverBg = novel.coverImage ? `background-image: url('${novel.coverImage}');` : '';
-
-        // Tách các tag hiển thị thành từng ô badge nhỏ
         const tagBadgesHtml = (novel.genre || "Tiểu thuyết").split(/[,/]+/).map(t => `<span class="tag">${escapeHtml(t.trim())}</span>`).join(" ");
 
+        // BÌA TRANG CHỦ HOÀN TOÀN SẠCH CHỮ VÀ BIỂU TƯỢNG SÁCH
         card.innerHTML = `
-          <div class="novel-cover" style="${coverBg}">
-            <div class="novel-cover-overlay">
-              <div style="font-size: 22px; margin-bottom: 4px;">📕</div>
-              <span>${novel.chapters.length} CHƯƠNG</span>
-              <span style="font-size:9px; opacity:0.8; margin-top:2px;">${totalWords} TỪ</span>
-            </div>
-          </div>
+          <div class="novel-cover" style="${coverBg}"></div>
           <div class="novel-info">
             <div>
               <div class="novel-badges">
@@ -1532,8 +1472,6 @@
       document.getElementById('cover-view').style.display = 'block';
 
       document.getElementById('book-title').textContent = novel.title;
-      document.getElementById('cover-art-title').textContent = novel.title;
-      document.getElementById('cover-art-genre').textContent = novel.genre || "Tác Phẩm Gốc";
       document.getElementById('book-author').textContent = novel.author || userProfile.name;
       document.getElementById('book-status').textContent = novel.status || "Đang ra";
       document.getElementById('book-chapter-count').textContent = `${novel.chapters.length} chương`;
@@ -1759,13 +1697,12 @@
       document.getElementById('story-modal').style.display = 'flex';
     }
 
-// 2. HÀM LƯU TÁC PHẨM CHUẨN XÁC
+    // LƯU TÁC PHẨM ĐẢM BẢO KHÔNG LỖI ẢNH BÌA
     function saveStoryModal() {
       const title = document.getElementById('story-modal-title').value.trim();
       const coverUrlInput = document.getElementById('story-modal-cover-url').value.trim();
       const coverBase64 = document.getElementById('story-modal-cover-base64').value;
       
-      // Ưu tiên lấy ảnh vừa nén, nếu không có thì lấy link dán vào
       let finalCover = "";
       if (coverBase64) {
         finalCover = coverBase64;
@@ -1819,7 +1756,7 @@
           chapters: []
         });
         addExp(25);
-        if (typeof advanceQuest === 'function') advanceQuest('q_main_write', 1);
+        advanceQuest('q_main_write', 1);
         saveDB();
         closeModals();
         renderHome();
@@ -1877,7 +1814,6 @@
       const wordCount = countWords(content);
       const nowStr = new Date().toISOString().slice(0, 10);
 
-      // Cập nhật ngày sửa cho cả truyện
       novels[selectedNovelIndex].updatedAt = nowStr;
 
       if (editingChapterIndex !== null) {
