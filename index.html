@@ -296,29 +296,33 @@
     .novel-cover {
       width: 110px;
       min-width: 110px;
-      background: #111822;
+      background-color: #111822;
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-end;
       align-items: center;
       text-align: center;
       padding: 6px;
       position: relative;
-      background-size: cover;
-      background-position: center;
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
     }
     .novel-cover-overlay {
       position: absolute;
-      inset: 0;
-      background: rgba(10, 14, 20, 0.65);
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(10, 14, 20, 0.95), transparent);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       color: var(--neon);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: bold;
+      padding: 6px 2px;
     }
 
     .novel-info {
@@ -1327,12 +1331,33 @@
       return novel.updatedAt || "2026-10-09";
     }
 
+   // 1. TỰ ĐỘNG THU NHỎ & NÉN ẢNH (CHỐNG LỖI BỘ NHỚ FIREBASE)
     function handleCoverFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
+
       const reader = new FileReader();
       reader.onload = function(e) {
-        document.getElementById('story-modal-cover-base64').value = e.target.result;
+        const img = new Image();
+        img.onload = function() {
+          // Thu nhỏ kích thước ảnh vừa chuẩn bìa truyện (max width 360px)
+          const canvas = document.createElement('canvas');
+          const maxW = 360;
+          const scale = Math.min(1, maxW / img.width);
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // Nén thành ảnh JPEG nhẹ (chất lượng 0.7, chỉ tốn ~30KB)
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          document.getElementById('story-modal-cover-base64').value = compressedDataUrl;
+          
+          // Điền luôn vào ô link để bạn thấy ảnh đã sẵn sàng
+          document.getElementById('story-modal-cover-url').value = "[Đã tải và nén ảnh thành công]";
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }
@@ -1734,11 +1759,19 @@
       document.getElementById('story-modal').style.display = 'flex';
     }
 
+// 2. HÀM LƯU TÁC PHẨM CHUẨN XÁC
     function saveStoryModal() {
       const title = document.getElementById('story-modal-title').value.trim();
-      const coverUrl = document.getElementById('story-modal-cover-url').value.trim();
+      const coverUrlInput = document.getElementById('story-modal-cover-url').value.trim();
       const coverBase64 = document.getElementById('story-modal-cover-base64').value;
-      const coverImage = coverBase64 || coverUrl;
+      
+      // Ưu tiên lấy ảnh vừa nén, nếu không có thì lấy link dán vào
+      let finalCover = "";
+      if (coverBase64) {
+        finalCover = coverBase64;
+      } else if (coverUrlInput && coverUrlInput !== "[Đã tải và nén ảnh thành công]") {
+        finalCover = coverUrlInput;
+      }
 
       const genre = document.getElementById('story-modal-genre').value.trim();
       const status = document.getElementById('story-modal-status').value;
@@ -1746,12 +1779,15 @@
       const introText = document.getElementById('story-modal-intro').value.trim();
       const nowStr = new Date().toISOString().slice(0, 10);
 
-      if (!title) { alert("Vui lòng nhập tên truyện!"); return; }
+      if (!title) { 
+        alert("Vui lòng nhập tên truyện!"); 
+        return; 
+      }
 
       if (isEditingStory) {
         const cur = novels[selectedNovelIndex];
         cur.title = title;
-        if (coverImage) cur.coverImage = coverImage;
+        if (finalCover) cur.coverImage = finalCover;
         cur.genre = genre;
         cur.status = status;
         cur.desc = desc;
@@ -1772,7 +1808,7 @@
           genre: genre || "Chưa phân loại",
           status,
           desc,
-          coverImage: coverImage || "",
+          coverImage: finalCover || "",
           updatedAt: nowStr,
           introData: {
             title: "VĂN ÁN // GLITCH RECORD",
@@ -1783,7 +1819,7 @@
           chapters: []
         });
         addExp(25);
-        advanceQuest('q_main_write', 1);
+        if (typeof advanceQuest === 'function') advanceQuest('q_main_write', 1);
         saveDB();
         closeModals();
         renderHome();
