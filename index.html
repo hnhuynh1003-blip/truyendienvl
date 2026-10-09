@@ -302,6 +302,19 @@
     }
     @keyframes alertSlide { from { top: 30px; opacity: 0; } to { top: 60px; opacity: 1; } }
 
+    /* GLITCH EFFECT */
+    .glitch-text:hover {
+      animation: glitch-anim 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+    }
+    @keyframes glitch-anim {
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 1px); text-shadow: 2px 0 var(--red), -2px 0 var(--neon); }
+      40% { transform: translate(1px, -1px); text-shadow: -2px 0 var(--red), 2px 0 var(--neon); }
+      60% { transform: translate(-1px, 2px); text-shadow: 2px 0 var(--neon), -2px 0 var(--red); }
+      80% { transform: translate(2px, -1px); text-shadow: -2px 0 var(--neon), 2px 0 var(--red); }
+      100% { transform: translate(0); }
+    }
+
     /* DANH SÁCH TRUYỆN */
     .novel-grid {
       display: grid;
@@ -595,8 +608,8 @@
       <span class="cloud-status" id="cloud-indicator">☁️ Đang kết nối...</span>
     </div>
     <div style="display: flex; align-items: center; gap: 8px;">
-      <span class="user-info-badge" id="account-status-btn" onclick="openAuthModal()" title="Bấm để đăng nhập hoặc đổi tài khoản">👤 Khách</span>
-      <span class="role-badge" id="role-toggle-btn" onclick="toggleUserRole()" title="Nhấn để đổi quyền Tác giả / Độc giả">👑 Tác Giả</span>
+      <span class="user-info-badge" id="account-status-btn" onclick="openAuthModal()" title="Bấm để đổi tài khoản">👤 Khách</span>
+      <span class="role-badge reader" id="role-toggle-btn" onclick="toggleUserRole()" title="Nhấn để đổi quyền Tác giả / Độc giả">📖 Độc Giả</span>
       <button class="btn btn-primary admin-only" onclick="openStoryModal()">+ Tạo tác phẩm</button>
     </div>
   </header>
@@ -699,11 +712,11 @@
       <div class="reading-time-badge" id="reader-ch-time">⏱ Khoảng 1 phút đọc</div>
       <div class="reader-body" id="reader-content"></div>
 
-      <!-- HỘP RƠI BẢO VẬT HỆ THỐNG -->
+      <!-- HỘP RƠI BẢO VẬT HỆ THỐNG: KHÓA CHẶT CHỐNG BUG NHẬN NHIỀU LẦN -->
       <div class="reader-loot-box">
         <div style="font-size: 13px; font-weight: bold; color: var(--gold); margin-bottom: 6px;">🎁 TÀN TÍCH DỮ LIỆU CUỐI CHƯƠNG</div>
-        <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 10px;">Đọc xong chương, hệ thống mở khóa ngay 1 lượt lục lọi tàn tích không cần chờ!</p>
-        <button class="btn btn-primary" onclick="rollLootDrop(true)">🎲 Lục Lọi Bảo Vật Ngay</button>
+        <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 10px;" id="reader-loot-desc">Mỗi chương truyện chỉ chứa 1 mảnh tàn tích dữ liệu duy nhất.</p>
+        <button class="btn btn-primary" id="btn-chapter-loot-claim" onclick="claimChapterLootDrop()">🎲 Lục Lọi Bảo Vật Ngay</button>
       </div>
 
       <!-- LỜI NHẮN TÁC GIẢ -->
@@ -898,7 +911,7 @@
     </div>
   </div>
 
-  <!-- MODAL: ĐĂNG NHẬP / TẠO TÀI KHOẢN (ĐỘC LẬP THIẾT BỊ) -->
+  <!-- MODAL: ĐĂNG NHẬP / TẠO TÀI KHOẢN -->
   <div class="modal-overlay" id="auth-modal">
     <div class="modal-card" style="max-width: 400px; text-align: center;">
       <h2>🔑 ĐĂNG NHẬP HỆ THỐNG</h2>
@@ -1146,9 +1159,11 @@
     let novels = JSON.parse(localStorage.getItem('my_novels_library_db')) || initialNovels;
 
     // ==========================================
-    // CƠ CHẾ ĐĂNG NHẬP / PHÂN CHIA TÀI KHOẢN ĐỘC LẬP
+    // CƠ CHẾ ĐĂNG NHẬP & PHÂN QUYỀN MẶC ĐỊNH
     // ==========================================
     let currentUsername = localStorage.getItem('my_current_logged_user') || "";
+    
+    // MẶC ĐỊNH VÀO WEB LÀ ĐỘC GIẢ (READER) ĐỂ BẢO VỆ DỮ LIỆU
     let userProfile = {
       username: "guest",
       name: "Kẻ Lang Bạt",
@@ -1156,7 +1171,8 @@
       exp: 40,
       level: 1,
       currency: 50,
-      role: "admin",
+      role: "reader", 
+      lootedChapters: {}, // LƯU DANH SÁCH CHƯƠNG ĐÃ NHẶT QUÀ (CHỐNG BUG NHẬN NHIỀU LẦN)
       inventory: [
         { id: "init-1", name: "Mẩu Bánh Mì Mốc", rank: "F", type: "FOOD", icon: "🍞", desc: "Khô khốc, nhưng có thể chống đói lúc tuyệt vọng." },
         { id: "init-2", name: "Dao Gọt Trái Cây Cũ", rank: "E", type: "WEAPON", icon: "🔪", desc: "Vũ khí thô sơ nhất để tự vệ." }
@@ -1166,7 +1182,6 @@
 
     function loadLocalAccountProfile() {
       if (!currentUsername) {
-        // Chưa đăng nhập: Mở pop-up để người dùng đăng nhập/tạo tài khoản
         setTimeout(openAuthModal, 600);
       } else {
         const localKey = `profile_${currentUsername}`;
@@ -1174,10 +1189,14 @@
         if (saved) {
           userProfile = JSON.parse(saved);
         }
+        if (!userProfile.lootedChapters) userProfile.lootedChapters = {};
+        
+        // Luôn bảo đảm mặc định khi mở máy là Độc Giả
+        userProfile.role = "reader";
+
         document.getElementById('account-status-btn').textContent = `👤 ${currentUsername}`;
         document.getElementById('profile-account-id').textContent = `ID: ${currentUsername}`;
         
-        // Kéo dữ liệu của tài khoản này từ Firestore Cloud nếu có
         db.collection("user_profiles").doc(currentUsername).get().then(doc => {
           if (doc.exists) {
             const cloudData = doc.data();
@@ -1186,6 +1205,7 @@
             userProfile.currency = Math.max(userProfile.currency, cloudData.currency || 0);
             if (cloudData.inventory) userProfile.inventory = cloudData.inventory;
             if (cloudData.quests) userProfile.quests = cloudData.quests;
+            if (cloudData.lootedChapters) userProfile.lootedChapters = { ...userProfile.lootedChapters, ...cloudData.lootedChapters };
             saveCurrentAccount();
           }
         }).catch(err => console.log("Chưa có cloud profile:", err));
@@ -1199,7 +1219,6 @@
         const localKey = `profile_${currentUsername}`;
         localStorage.setItem(localKey, JSON.stringify(userProfile));
         
-        // Đồng bộ dữ liệu riêng của người dùng lên Cloud Firestore
         db.collection("user_profiles").doc(currentUsername).set({
           username: currentUsername,
           name: userProfile.name,
@@ -1209,8 +1228,9 @@
           currency: userProfile.currency,
           inventory: userProfile.inventory,
           quests: userProfile.quests,
+          lootedChapters: userProfile.lootedChapters || {},
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true }).catch(e => console.log("Lưu cloud user lỗi:", e));
+        }, { merge: true }).catch(e => console.log("Lỗi lưu user:", e));
       }
       updatePhoneUI();
     }
@@ -1235,12 +1255,12 @@
       if (saved) {
         userProfile = JSON.parse(saved);
       } else {
-        // Tài khoản mới hoàn toàn
         userProfile.username = currentUsername;
         userProfile.name = currentUsername;
         userProfile.level = 1;
         userProfile.exp = 0;
         userProfile.currency = 50;
+        userProfile.lootedChapters = {};
         userProfile.inventory = [
           { id: "init-1", name: "Mẩu Bánh Mì Mốc", rank: "F", type: "FOOD", icon: "🍞", desc: "Khô khốc, nhưng có thể chống đói lúc tuyệt vọng." },
           { id: "init-2", name: "Dao Gọt Trái Cây Cũ", rank: "E", type: "WEAPON", icon: "🔪", desc: "Vũ khí thô sơ nhất để tự vệ." }
@@ -1248,10 +1268,13 @@
         userProfile.quests = DEFAULT_SYSTEM_QUESTS;
       }
 
+      userProfile.role = "reader";
+
       saveCurrentAccount();
       document.getElementById('account-status-btn').textContent = `👤 ${currentUsername}`;
       document.getElementById('profile-account-id').textContent = `ID: ${currentUsername}`;
       closeModals();
+      applyUserRole();
       showSystemAlert("ĐĂNG NHẬP THÀNH CÔNG", `Chào mừng thực thể [${currentUsername}] vào hệ thống!`);
       renderHome();
     }
@@ -1277,7 +1300,7 @@
     let questTab = "ALL";
     let isZen = false;
 
-    // COOLDOWN 10 PHÚT
+    // COOLDOWN NHẶT ĐỒ Ở KHO (10 PHÚT)
     const COOLDOWN_DURATION = 10 * 60 * 1000;
     let lastLootTimestamp = parseInt(localStorage.getItem('my_last_loot_ts')) || 0;
     let cooldownTimerInterval = null;
@@ -1301,7 +1324,6 @@
       saveCurrentAccount();
     }
 
-    // ĐỒNG BỘ TRUYỆN QUA FIREBASE
     function saveDB() {
       localStorage.setItem('my_novels_library_db', JSON.stringify(novels));
       saveCurrentAccount();
@@ -1414,16 +1436,26 @@
       saveCurrentAccount();
     }
 
+    // ==========================================
+    // SỬA DỨT ĐIỂM: CHẶN LẶP THÔNG BÁO NHIỆM VỤ
+    // ==========================================
     function advanceQuest(questId, amount = 1) {
       const q = userProfile.quests.find(item => item.id === questId);
-      if (q && !q.claimed) {
-        q.current = Math.min(q.target, q.current + amount);
-        if (q.current >= q.target) {
-          showSystemAlert("ĐINH! NHIỆM VỤ HOÀN TẤT", `Nhiệm vụ: "${q.title}" đã sẵn sàng nhận thưởng!`);
-        }
-        saveCurrentAccount();
-        renderQuests();
+      
+      // Khóa ngay lập tức: nếu đã claim HOẶC current đã đạt target thì không xử lý nữa
+      if (!q || q.claimed || q.current >= q.target) {
+        return;
       }
+
+      q.current = Math.min(q.target, q.current + amount);
+
+      // Chỉ thông báo duy nhất tại khoảnh khắc vừa đạt mục tiêu
+      if (q.current >= q.target) {
+        showSystemAlert("ĐINH! NHIỆM VỤ HOÀN TẤT", `Nhiệm vụ: "${q.title}" đã sẵn sàng nhận thưởng!`);
+      }
+
+      saveCurrentAccount();
+      renderQuests();
     }
 
     function claimQuestReward(questId) {
@@ -1484,6 +1516,48 @@
       cooldownTimerInterval = setInterval(updateBtnState, 1000);
     }
 
+    // ==========================================
+    // KHÓA BUG TÀN TÍCH CUỐI CHƯƠNG (CHỈ NHẶT 1 LẦN)
+    // ==========================================
+    function updateChapterLootButtonState() {
+      const novel = novels[selectedNovelIndex];
+      const ch = novel && novel.chapters ? novel.chapters[selectedChapterIndex] : null;
+      const lootBtn = document.getElementById('btn-chapter-loot-claim');
+      const lootDesc = document.getElementById('reader-loot-desc');
+
+      if (!ch || !lootBtn) return;
+
+      const lootKey = `${novel.id}_${ch.id || selectedChapterIndex}`;
+      if (userProfile.lootedChapters && userProfile.lootedChapters[lootKey]) {
+        lootBtn.disabled = true;
+        lootBtn.textContent = "✔ Đã thu thập tàn tích chương này";
+        lootDesc.textContent = "Bạn đã khám phá toàn bộ tàn tích của chương này rồi. Hãy đọc chương tiếp theo nhé!";
+      } else {
+        lootBtn.disabled = false;
+        lootBtn.textContent = "🎲 Lục Lọi Bảo Vật Ngay";
+        lootDesc.textContent = "Mỗi chương truyện chỉ chứa 1 mảnh tàn tích dữ liệu duy nhất.";
+      }
+    }
+
+    function claimChapterLootDrop() {
+      const novel = novels[selectedNovelIndex];
+      const ch = novel.chapters[selectedChapterIndex];
+      const lootKey = `${novel.id}_${ch.id || selectedChapterIndex}`;
+
+      if (!userProfile.lootedChapters) userProfile.lootedChapters = {};
+      
+      // Chặn nếu chương này đã từng nhận rồi
+      if (userProfile.lootedChapters[lootKey]) {
+        showSystemAlert("KHÔNG CÒN TÀN TÍCH", "Chương này bạn đã nhặt quà rồi, không thể nhận thêm!");
+        return;
+      }
+
+      // Đánh dấu đã nhận vĩnh viễn
+      userProfile.lootedChapters[lootKey] = true;
+      rollLootDrop(true);
+      updateChapterLootButtonState();
+    }
+
     function rollLootDrop(isFreeFromChapter = false) {
       const now = Date.now();
 
@@ -1491,7 +1565,7 @@
         const remainSec = Math.ceil((COOLDOWN_DURATION - (now - lastLootTimestamp)) / 1000);
         const mins = Math.floor(remainSec / 60);
         const secs = remainSec % 60;
-        showSystemAlert("HỆ THỐNG ĐANG NẠP LẠI", `Vui lòng chờ ${mins}p ${secs}s hoặc đọc xong 1 chương để nhặt tiếp!`);
+        showSystemAlert("HỆ THỐNG ĐANG NẠP LẠI", `Vui lòng chờ ${mins}p ${secs}s để nhặt tiếp!`);
         return;
       }
 
@@ -1520,9 +1594,11 @@
       userProfile.inventory.unshift({ ...picked, instanceId: "item-" + Date.now() });
       addExp(targetRank === 'SSS' ? 100 : (targetRank === 'S' ? 40 : 10));
 
-      lastLootTimestamp = now;
-      localStorage.setItem('my_last_loot_ts', now.toString());
-      startCooldownTicker();
+      if (!isFreeFromChapter) {
+        lastLootTimestamp = now;
+        localStorage.setItem('my_last_loot_ts', now.toString());
+        startCooldownTicker();
+      }
 
       advanceQuest('q_daily_loot', 1);
 
@@ -1886,6 +1962,9 @@
         scrollTop: scrollPos || 0
       }));
 
+      // Cập nhật trạng thái nút nhận tàn tích của chương hiện tại
+      updateChapterLootButtonState();
+
       addExp(5);
       advanceQuest('q_daily_read', 1);
       if (chIdx === 0) advanceQuest('q_main_intro', 1);
@@ -1901,7 +1980,6 @@
       if (selectedChapterIndex < novel.chapters.length - 1) readChapter(selectedChapterIndex + 1);
     }
 
-    // LẮNG NGHE CUỘN: HIỆN NÚT NỔI VÀ LƯU BOOKMARK
     window.addEventListener('scroll', () => {
       const isReaderActive = document.getElementById('reader-view').style.display === 'block';
       const floatBar = document.getElementById('floating-reading-bar');
