@@ -2,9 +2,19 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DUDU Studio</title>
   
+  <!-- CẤU HÌNH PWA & STANDALONE (ẨN LINK WEB VÀ THANH TRÌNH DUYỆT TRÊN ĐIỆN THOẠI) -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DUDU Studio">
+  <meta name="theme-color" content="#0a0e14">
+
+  <!-- EMBEDDED WEB APP MANIFEST -->
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22DUDU%20Studio%22%2C%22short_name%22%3A%22DUDU%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a0e14%22%2C%22theme_color%22%3A%22%230a0e14%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Crect%20width%3D%27100%27%20height%3D%27100%27%20rx%3D%2720%27%20fill%3D%27%230a0e14%27%2F%3E%3Ctext%20x%3D%2750%27%20y%3D%2765%27%20font-size%3D%2750%27%20text-anchor%3D%27middle%27%20fill%3D%27%2366fcf1%27%3E%E2%9C%A6%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+
   <!-- FIREBASE SDK COMPAT -->
   <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
@@ -55,7 +65,7 @@
       --text-white: #ffffff;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     body {
       background-color: var(--bg-main);
@@ -64,6 +74,7 @@
       line-height: 1.8;
       min-height: 100vh;
       padding-bottom: 80px;
+      padding-top: env(safe-area-inset-top, 0px);
       transition: background-color 0.25s, color 0.25s;
     }
 
@@ -622,7 +633,7 @@
       <!-- BỘ LỌC TÌM KIẾM, TAG & THỜI GIAN -->
       <div class="filter-panel">
         <div class="search-row">
-          <input type="text" class="search-input" id="search-novel-input" placeholder="🔍 Tìm theo tên truyện, nhân vật hoặc nội dung..." oninput="onSearchChange()">
+          <input type="text" class="search-input" id="search-novel-input" autocomplete="off" placeholder="🔍 Tìm theo tên truyện, nhân vật hoặc nội dung..." oninput="onSearchChange()">
           <select class="sort-select" id="sort-select-ctrl" onchange="onSortChange()">
             <option value="NEWEST_UPDATE">⏱ Mới cập nhật nhất</option>
             <option value="OLDEST_UPDATE">⏳ Cũ nhất</option>
@@ -919,11 +930,11 @@
       
       <div class="modal-field" style="text-align: left; margin-top: 10px;">
         <label>Tên đăng nhập (ID người chơi):</label>
-        <input type="text" id="auth-username" placeholder="Ví dụ: dudu_phone hoặc reader_pc">
+        <input type="text" id="auth-username" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Ví dụ: dudu_phone hoặc reader_pc">
       </div>
       <div class="modal-field" style="text-align: left;">
         <label>Mã PIN bảo mật (Tùy chọn):</label>
-        <input type="password" id="auth-pin" placeholder="Ví dụ: 1234">
+        <input type="password" id="auth-pin" autocomplete="off" placeholder="Ví dụ: 1234">
       </div>
 
       <div style="display: flex; gap: 10px; margin-top: 14px;">
@@ -939,11 +950,11 @@
       <h2 id="story-modal-heading">THÊM TÁC PHẨM MỚI</h2>
       <div class="modal-field">
         <label>Tên tác phẩm:</label>
-        <input type="text" id="story-modal-title" placeholder="Ví dụ: truyện điên vl">
+        <input type="text" id="story-modal-title" autocomplete="off" placeholder="Ví dụ: truyện điên vl">
       </div>
       <div class="modal-field">
         <label>Ảnh bìa truyện (Dán link URL hoặc chọn file từ máy):</label>
-        <input type="text" id="story-modal-cover-url" placeholder="Dán đường link ảnh bìa (https://...)...">
+        <input type="text" id="story-modal-cover-url" autocomplete="off" placeholder="Dán đường link ảnh bìa (https://...)...">
         <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
           <input type="file" id="story-modal-cover-file" accept="image/*" onchange="handleCoverFileUpload(event)">
         </div>
@@ -951,7 +962,7 @@
       </div>
       <div class="modal-field">
         <label>Thể loại / Tags (Ngăn cách bằng dấu phẩy):</label>
-        <input type="text" id="story-modal-genre" placeholder="Vô hạn lưu, Hệ thống, Glitch, Kinh dị, Xuyên nhanh...">
+        <input type="text" id="story-modal-genre" autocomplete="off" placeholder="Vô hạn lưu, Hệ thống, Glitch, Kinh dị, Xuyên nhanh...">
       </div>
       <div class="modal-field">
         <label>Trạng thái:</label>
@@ -963,11 +974,11 @@
       </div>
       <div class="modal-field">
         <label>Tóm tắt ngắn (Hiện ngoài bìa):</label>
-        <input type="text" id="story-modal-desc" placeholder="Tóm tắt ngắn gọn...">
+        <input type="text" id="story-modal-desc" autocomplete="off" placeholder="Tóm tắt ngắn gọn...">
       </div>
       <div class="modal-field">
         <label>Khung văn án mở đầu (Terminal glitch):</label>
-        <textarea id="story-modal-intro" style="height: 100px;" placeholder="Mã nguồn lỗi, trích dẫn bối cảnh..."></textarea>
+        <textarea id="story-modal-intro" autocomplete="off" style="height: 100px;" placeholder="Mã nguồn lỗi, trích dẫn bối cảnh..."></textarea>
       </div>
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
         <button class="btn" onclick="closeModals()">Hủy</button>
@@ -976,7 +987,7 @@
     </div>
   </div>
 
-  <!-- MODAL: TẠO / SỬA CHƯƠNG -->
+  <!-- MODAL: TẠO / SỬA CHƯƠNG (ĐÃ TẮT HOÀN TOÀN AUTOCOMPLETE GỢI Ý CHƯƠNG CŨ) -->
   <div class="modal-overlay" id="chapter-modal">
     <div class="modal-card" id="chapter-modal-card">
       <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -985,16 +996,16 @@
       </div>
       <div class="modal-field">
         <label>Tên chương:</label>
-        <input type="text" id="chapter-modal-title" placeholder="Ví dụ: Chương 1: Khoảng Trắng Của Kẻ Lang Bạt">
+        <input type="text" id="chapter-modal-title" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Ví dụ: Chương 1: Khoảng Trắng Của Kẻ Lang Bạt">
       </div>
       <div class="modal-field">
         <label>Nội dung chương:</label>
-        <textarea id="chapter-modal-content" style="height: 240px;" oninput="onChapterInput()" placeholder="Dán nội dung chương vào đây..."></textarea>
+        <textarea id="chapter-modal-content" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="height: 240px;" oninput="onChapterInput()" placeholder="Dán nội dung chương vào đây..."></textarea>
         <div class="word-counter" id="ch-word-preview">0 từ</div>
       </div>
       <div class="modal-field">
         <label>Lời nhắn của tác giả ở cuối chương (Author Note):</label>
-        <input type="text" id="chapter-modal-author-note" placeholder="Lời bình hoặc thông báo ra chương tiếp...">
+        <input type="text" id="chapter-modal-author-note" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Lời bình hoặc thông báo ra chương tiếp...">
       </div>
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
         <button class="btn" onclick="closeModals()">Hủy</button>
@@ -1009,19 +1020,19 @@
       <h2 id="char-modal-heading">THÊM NHÂN VẬT MỚI</h2>
       <div class="modal-field">
         <label>Tên nhân vật:</label>
-        <input type="text" id="char-input-name" placeholder="Ví dụ: Ôn Tri Hành">
+        <input type="text" id="char-input-name" autocomplete="off" placeholder="Ví dụ: Ôn Tri Hành">
       </div>
       <div class="modal-field">
         <label>Vai trò / Thân phận:</label>
-        <input type="text" id="char-input-role" placeholder="Ví dụ: Nhân vật chính, Đồng hành, Cố nhân...">
+        <input type="text" id="char-input-role" autocomplete="off" placeholder="Ví dụ: Nhân vật chính, Đồng hành, Cố nhân...">
       </div>
       <div class="modal-field">
         <label>Trạng thái hiện tại:</label>
-        <input type="text" id="char-input-status" placeholder="Ví dụ: Còn sống, Đã chết, Mất kết nối, Bị phong tỏa...">
+        <input type="text" id="char-input-status" autocomplete="off" placeholder="Ví dụ: Còn sống, Đã chết, Mất kết nối, Bị phong tỏa...">
       </div>
       <div class="modal-field">
         <label>Ghi chú / Mô tả đặc điểm:</label>
-        <textarea id="char-input-note" style="height: 80px;" placeholder="Ghi chú về tính cách, ký ức hoặc manh mối..."></textarea>
+        <textarea id="char-input-note" autocomplete="off" style="height: 80px;" placeholder="Ghi chú về tính cách, ký ức hoặc manh mối..."></textarea>
       </div>
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
         <button class="btn" onclick="closeModals()">Hủy</button>
@@ -1163,7 +1174,7 @@
     // ==========================================
     let currentUsername = localStorage.getItem('my_current_logged_user') || "";
     
-    // MẶC ĐỊNH VÀO WEB LÀ ĐỘC GIẢ (READER) ĐỂ BẢO VỆ DỮ LIỆU
+    // MẶC ĐỊNH LUÔN LÀ "reader" (ĐỘC GIẢ) ĐỂ TRÁNH LỖI UPLOAD ĐÈ
     let userProfile = {
       username: "guest",
       name: "Kẻ Lang Bạt",
@@ -1172,7 +1183,7 @@
       level: 1,
       currency: 50,
       role: "reader", 
-      lootedChapters: {}, // LƯU DANH SÁCH CHƯƠNG ĐÃ NHẶT QUÀ (CHỐNG BUG NHẬN NHIỀU LẦN)
+      lootedChapters: {}, // LƯU DANH SÁCH CHƯƠNG ĐÃ NHẶT (CHỐNG BUG NHẬN NHIỀU LẦN)
       inventory: [
         { id: "init-1", name: "Mẩu Bánh Mì Mốc", rank: "F", type: "FOOD", icon: "🍞", desc: "Khô khốc, nhưng có thể chống đói lúc tuyệt vọng." },
         { id: "init-2", name: "Dao Gọt Trái Cây Cũ", rank: "E", type: "WEAPON", icon: "🔪", desc: "Vũ khí thô sơ nhất để tự vệ." }
@@ -1191,7 +1202,6 @@
         }
         if (!userProfile.lootedChapters) userProfile.lootedChapters = {};
         
-        // Luôn bảo đảm mặc định khi mở máy là Độc Giả
         userProfile.role = "reader";
 
         document.getElementById('account-status-btn').textContent = `👤 ${currentUsername}`;
@@ -1437,19 +1447,17 @@
     }
 
     // ==========================================
-    // SỬA DỨT ĐIỂM: CHẶN LẶP THÔNG BÁO NHIỆM VỤ
+    // CHẶN LẶP THÔNG BÁO NHIỆM VỤ
     // ==========================================
     function advanceQuest(questId, amount = 1) {
       const q = userProfile.quests.find(item => item.id === questId);
       
-      // Khóa ngay lập tức: nếu đã claim HOẶC current đã đạt target thì không xử lý nữa
       if (!q || q.claimed || q.current >= q.target) {
         return;
       }
 
       q.current = Math.min(q.target, q.current + amount);
 
-      // Chỉ thông báo duy nhất tại khoảnh khắc vừa đạt mục tiêu
       if (q.current >= q.target) {
         showSystemAlert("ĐINH! NHIỆM VỤ HOÀN TẤT", `Nhiệm vụ: "${q.title}" đã sẵn sàng nhận thưởng!`);
       }
@@ -1517,7 +1525,7 @@
     }
 
     // ==========================================
-    // KHÓA BUG TÀN TÍCH CUỐI CHƯƠNG (CHỈ NHẶT 1 LẦN)
+    // KHÓA BUG TÀN TÍCH CUỐI CHƯƠNG (CHỈ NHẶT 1 LẦN DUY NHẤT)
     // ==========================================
     function updateChapterLootButtonState() {
       const novel = novels[selectedNovelIndex];
@@ -1546,13 +1554,11 @@
 
       if (!userProfile.lootedChapters) userProfile.lootedChapters = {};
       
-      // Chặn nếu chương này đã từng nhận rồi
       if (userProfile.lootedChapters[lootKey]) {
         showSystemAlert("KHÔNG CÒN TÀN TÍCH", "Chương này bạn đã nhặt quà rồi, không thể nhận thêm!");
         return;
       }
 
-      // Đánh dấu đã nhận vĩnh viễn
       userProfile.lootedChapters[lootKey] = true;
       rollLootDrop(true);
       updateChapterLootButtonState();
@@ -1962,7 +1968,7 @@
         scrollTop: scrollPos || 0
       }));
 
-      // Cập nhật trạng thái nút nhận tàn tích của chương hiện tại
+      // Cập nhật trạng thái nhận tàn tích của chương này
       updateChapterLootButtonState();
 
       addExp(5);
@@ -1980,6 +1986,7 @@
       if (selectedChapterIndex < novel.chapters.length - 1) readChapter(selectedChapterIndex + 1);
     }
 
+    // LẮNG NGHE CUỘN: HIỆN NÚT NỔI VÀ LƯU BOOKMARK
     window.addEventListener('scroll', () => {
       const isReaderActive = document.getElementById('reader-view').style.display === 'block';
       const floatBar = document.getElementById('floating-reading-bar');
