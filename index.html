@@ -5,15 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DUDU Studio</title>
   
-  <!-- CẤU HÌNH PWA & STANDALONE (ẨN LINK WEB VÀ THANH TRÌNH DUYỆT TRÊN ĐIỆN THOẠI) -->
+  <!-- CẤU HÌNH PWA CHUẨN ĐỘC LẬP -->
+  <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="DUDU Studio">
   <meta name="theme-color" content="#0a0e14">
-
-  <!-- EMBEDDED WEB APP MANIFEST -->
-  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22DUDU%20Studio%22%2C%22short_name%22%3A%22DUDU%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a0e14%22%2C%22theme_color%22%3A%22%230a0e14%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Crect%20width%3D%27100%27%20height%3D%27100%27%20rx%3D%2720%27%20fill%3D%27%230a0e14%27%2F%3E%3Ctext%20x%3D%2750%27%20y%3D%2765%27%20font-size%3D%2750%27%20text-anchor%3D%27middle%27%20fill%3D%27%2366fcf1%27%3E%E2%9C%A6%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 
   <!-- FIREBASE SDK COMPAT -->
   <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
@@ -78,12 +76,14 @@
       transition: background-color 0.25s, color 0.25s;
     }
 
+    /* HEADER GỌN GÀNG TRÊN MỌI THIẾT BỊ */
     header {
       position: sticky;
       top: 0;
-      background: var(--bg-main);
+      background: rgba(10, 14, 20, 0.95);
+      backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border);
-      padding: 12px 20px;
+      padding: 10px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -91,41 +91,51 @@
     }
 
     .brand {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
       color: var(--neon);
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
     }
 
     .cloud-status {
-      font-size: 11px;
+      font-size: 10px;
       color: #10b981;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      white-space: nowrap;
     }
 
     .user-info-badge {
-      font-size: 11px;
-      padding: 3px 8px;
+      font-size: 10px;
+      padding: 2px 7px;
       border-radius: 12px;
       border: 1px solid var(--border);
       color: var(--gold);
       background: rgba(245, 158, 11, 0.1);
       cursor: pointer;
+      white-space: nowrap;
     }
 
     .role-badge {
-      font-size: 11px;
-      padding: 3px 8px;
+      font-size: 10px;
+      padding: 2px 7px;
       border-radius: 12px;
       cursor: pointer;
       border: 1px solid var(--neon);
       color: var(--neon);
       background: rgba(102, 252, 241, 0.1);
+      white-space: nowrap;
     }
     .role-badge.reader {
       border-color: var(--text-dim);
@@ -137,8 +147,8 @@
       background: transparent;
       border: 1px solid var(--accent);
       color: var(--neon);
-      padding: 6px 14px;
-      font-size: 13px;
+      padding: 5px 12px;
+      font-size: 12px;
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.2s;
@@ -154,7 +164,7 @@
     .container {
       max-width: 860px;
       margin: 0 auto;
-      padding: 20px 16px;
+      padding: 14px 12px;
     }
 
     body.is-reader .admin-only {
@@ -165,13 +175,13 @@
     .floating-reading-controls {
       display: none;
       position: fixed;
-      bottom: 24px;
-      left: 20px;
+      bottom: 20px;
+      left: 14px;
       z-index: 1000;
-      gap: 8px;
-      background: rgba(10, 14, 20, 0.85);
+      gap: 6px;
+      background: rgba(10, 14, 20, 0.88);
       backdrop-filter: blur(8px);
-      padding: 6px 10px;
+      padding: 4px 8px;
       border-radius: 30px;
       border: 1px solid var(--accent);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
@@ -180,42 +190,39 @@
       background: transparent;
       border: none;
       color: var(--neon);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: bold;
-      padding: 4px 8px;
+      padding: 4px 6px;
       cursor: pointer;
-      border-radius: 14px;
-      transition: background 0.2s;
+      border-radius: 12px;
     }
-    .floating-btn:hover { background: rgba(102, 252, 241, 0.15); }
 
-    /* BỘ LỌC TÌM KIẾM & TAG */
+    /* BỘ LỌC TÌM KIẾM THIẾT KẾ GỌN */
     .filter-panel {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 20px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
     }
 
     .search-row {
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
     }
     .search-input {
       flex: 1;
-      min-width: 200px;
       background: var(--bg-main);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 8px 12px;
+      padding: 6px 10px;
       color: var(--text-white);
       outline: none;
-      font-size: 13px;
+      font-size: 12px;
     }
     .search-input:focus { border-color: var(--neon); }
 
@@ -223,30 +230,36 @@
       background: var(--bg-main);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 8px 10px;
+      padding: 6px 8px;
       color: var(--neon);
       outline: none;
-      font-size: 12px;
+      font-size: 11px;
       cursor: pointer;
     }
 
+    /* TAGS VUỐT NGANG (TIẾT KIỆM KHÔNG GIAN) */
     .tags-container {
       display: flex;
-      flex-wrap: wrap;
       gap: 6px;
       align-items: center;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding-bottom: 3px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
     }
+    .tags-container::-webkit-scrollbar { display: none; }
+
     .tag-chip {
-      font-size: 11px;
+      font-size: 10px;
       padding: 3px 8px;
       border-radius: 6px;
       background: var(--bg-main);
       border: 1px solid var(--border);
       color: var(--text-dim);
       cursor: pointer;
-      transition: all 0.2s;
+      flex-shrink: 0;
     }
-    .tag-chip:hover { border-color: var(--accent); color: var(--text-white); }
     .tag-chip.active {
       background: rgba(102, 252, 241, 0.15);
       border-color: var(--neon);
@@ -258,28 +271,27 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
-      padding-top: 10px;
+      padding-top: 6px;
     }
 
     .filter-btn {
       background: var(--bg-main);
       border: 1px solid var(--border);
       color: var(--text-dim);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-size: 10px;
       cursor: pointer;
     }
     .filter-btn.active { border-color: var(--neon); color: var(--neon); font-weight: bold; }
 
     /* MÀU PHẨM CẤP */
     .rank-tag {
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 800;
-      padding: 1px 5px;
+      padding: 1px 4px;
       border-radius: 3px;
       text-transform: uppercase;
       display: inline-block;
@@ -290,64 +302,51 @@
     .rank-C { background: #16a34a; color: #fff; }
     .rank-B { background: #8b5cf6; color: #fff; }
     .rank-A { background: #d97706; color: #fff; }
-    .rank-S { background: #ea580c; color: #fff; box-shadow: 0 0 6px #ea580c; }
-    .rank-SS { background: #e11d48; color: #fff; box-shadow: 0 0 8px #e11d48; }
-    .rank-SSS { background: linear-gradient(90deg, #ec4899, #eab308, #06b6d4); color: #000; font-weight: 900; box-shadow: 0 0 10px #eab308; }
+    .rank-S { background: #ea580c; color: #fff; }
+    .rank-SS { background: #e11d48; color: #fff; }
+    .rank-SSS { background: linear-gradient(90deg, #ec4899, #eab308, #06b6d4); color: #000; font-weight: 900; }
 
     /* THÔNG BÁO HỆ THỐNG */
     #system-alert-banner {
       display: none;
       position: fixed;
-      top: 60px;
+      top: 54px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(15, 23, 42, 0.95);
       border: 2px solid var(--neon);
       border-radius: 8px;
-      padding: 12px 20px;
+      padding: 10px 16px;
       z-index: 2500;
       box-shadow: 0 0 20px rgba(102, 252, 241, 0.5);
       color: #fff;
       text-align: center;
-      animation: alertSlide 0.3s ease;
-    }
-    @keyframes alertSlide { from { top: 30px; opacity: 0; } to { top: 60px; opacity: 1; } }
-
-    /* GLITCH EFFECT */
-    .glitch-text:hover {
-      animation: glitch-anim 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
-    }
-    @keyframes glitch-anim {
-      0% { transform: translate(0); }
-      20% { transform: translate(-2px, 1px); text-shadow: 2px 0 var(--red), -2px 0 var(--neon); }
-      40% { transform: translate(1px, -1px); text-shadow: -2px 0 var(--red), 2px 0 var(--neon); }
-      60% { transform: translate(-1px, 2px); text-shadow: 2px 0 var(--neon), -2px 0 var(--red); }
-      80% { transform: translate(2px, -1px); text-shadow: -2px 0 var(--neon), 2px 0 var(--red); }
-      100% { transform: translate(0); }
+      width: 90%;
+      max-width: 320px;
     }
 
     /* DANH SÁCH TRUYỆN */
     .novel-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 18px;
+      gap: 12px;
     }
-    @media (min-width: 660px) { .novel-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 660px) { .novel-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
 
     .novel-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
       display: flex;
       cursor: pointer;
-      transition: border-color 0.2s, transform 0.2s;
+      transition: transform 0.2s;
     }
-    .novel-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .novel-card:active { transform: scale(0.98); }
 
     .novel-cover {
-      width: 110px;
-      min-width: 110px;
+      width: 90px;
+      min-width: 90px;
       background-color: #111822;
       border-right: 1px solid var(--border);
       background-size: cover !important;
@@ -356,70 +355,77 @@
     }
 
     .novel-info {
-      padding: 14px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       flex: 1;
+      overflow: hidden;
     }
-    .novel-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
-    .tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); color: var(--text-dim); }
+    .novel-badges {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+      max-height: 24px;
+      overflow: hidden;
+    }
+    .tag { font-size: 9px; padding: 1px 5px; border-radius: 4px; border: 1px solid var(--border); color: var(--text-dim); }
     .tag-status { color: var(--neon); border-color: var(--accent); }
 
-    .novel-title { font-size: 17px; font-weight: bold; color: var(--text-white); margin-bottom: 4px; }
+    .novel-title { font-size: 15px; font-weight: bold; color: var(--text-white); margin-bottom: 2px; line-height: 1.3; }
     .novel-desc {
-      font-size: 13px; color: var(--text-dim);
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 8px;
+      font-size: 11px; color: var(--text-dim); line-height: 1.4;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 6px;
     }
     .novel-meta {
       display: flex; justify-content: space-between; align-items: center;
-      font-size: 11px; color: var(--accent); border-top: 1px solid var(--border); padding-top: 8px;
+      font-size: 10px; color: var(--accent); border-top: 1px solid var(--border); padding-top: 6px;
     }
 
     /* TRANG BÌA & MỤC LỤC */
     #cover-view { display: none; }
     .book-cover-banner {
-      display: flex; flex-direction: column; gap: 20px;
-      background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 22px; margin-bottom: 24px;
+      display: flex; flex-direction: column; gap: 14px;
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px;
     }
     @media (min-width: 600px) { .book-cover-banner { flex-direction: row; align-items: center; } }
 
     .book-cover-art {
-      width: 145px; height: 210px; min-width: 145px; margin: 0 auto;
+      width: 120px; height: 175px; min-width: 120px; margin: 0 auto;
       border: 2px solid var(--neon); border-radius: 8px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
       background-size: cover !important;
       background-position: center !important;
       background-repeat: no-repeat !important;
     }
 
     .book-banner-meta { flex: 1; }
-    .book-banner-meta h1 { font-size: 26px; color: var(--text-white); margin-bottom: 6px; }
-    .book-stats { font-size: 13px; color: var(--neon); margin-bottom: 12px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .book-banner-meta h1 { font-size: 20px; color: var(--text-white); margin-bottom: 4px; }
+    .book-stats { font-size: 11px; color: var(--neon); margin-bottom: 8px; display: flex; gap: 10px; flex-wrap: wrap; }
 
     .intro-terminal-box {
       background: rgba(15, 20, 25, 0.7);
       border: 1px solid var(--accent);
-      border-left: 4px solid var(--neon);
-      border-radius: 8px; padding: 16px; margin-bottom: 24px;
+      border-left: 3px solid var(--neon);
+      border-radius: 8px; padding: 12px; margin-bottom: 16px;
     }
     .intro-header {
-      font-size: 12px; font-weight: bold; color: var(--neon); letter-spacing: 1.5px;
-      margin-bottom: 8px; display: flex; justify-content: space-between;
+      font-size: 11px; font-weight: bold; color: var(--neon); letter-spacing: 1px;
+      margin-bottom: 6px; display: flex; justify-content: space-between;
     }
     .intro-text {
-      font-size: 14px; color: var(--text-dim); font-family: "Courier New", Courier, monospace;
-      white-space: pre-line; line-height: 1.6;
+      font-size: 12px; color: var(--text-dim); font-family: "Courier New", Courier, monospace;
+      white-space: pre-line; line-height: 1.5;
     }
 
-    .index-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .chapter-items { display: flex; flex-direction: column; gap: 10px; }
+    .index-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .chapter-items { display: flex; flex-direction: column; gap: 8px; }
     .chapter-item {
       background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px;
-      padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 12px; display: flex; justify-content: space-between; align-items: center;
     }
-    .chapter-name-click { cursor: pointer; flex: 1; font-size: 15px; color: var(--text-white); }
-    .chapter-name-click:hover { color: var(--neon); }
+    .chapter-name-click { cursor: pointer; flex: 1; font-size: 14px; color: var(--text-white); }
 
     /* TRÌNH ĐỌC TRUYỆN */
     #reader-view { display: none; }
@@ -429,10 +435,10 @@
     }
     .reader-top-nav {
       display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 22px;
+      border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 16px;
     }
-    .reader-chapter-title { font-size: 24px; color: var(--text-white); font-weight: bold; margin-bottom: 8px; }
-    .reading-time-badge { font-size: 12px; color: var(--text-dim); margin-bottom: 24px; }
+    .reader-chapter-title { font-size: 20px; color: var(--text-white); font-weight: bold; margin-bottom: 6px; }
+    .reading-time-badge { font-size: 11px; color: var(--text-dim); margin-bottom: 18px; }
     .reader-body {
       font-family: var(--font-reading);
       font-size: var(--read-size);
@@ -440,18 +446,18 @@
       text-align: justify;
       line-height: 1.85;
     }
-    .reader-body p { margin-bottom: 20px; text-indent: 1.5em; }
+    .reader-body p { margin-bottom: 16px; text-indent: 1.2em; }
 
     .author-note-box {
-      margin-top: 36px; padding: 16px; border-radius: 8px;
+      margin-top: 24px; padding: 12px; border-radius: 8px;
       background: rgba(69, 162, 158, 0.08); border-left: 3px solid var(--accent);
-      font-size: 14px; color: var(--text-dim);
+      font-size: 13px; color: var(--text-dim);
     }
-    .author-note-title { font-weight: bold; color: var(--neon); margin-bottom: 6px; }
+    .author-note-title { font-weight: bold; color: var(--neon); margin-bottom: 4px; }
 
     .reader-loot-box {
-      margin-top: 30px;
-      padding: 16px;
+      margin-top: 24px;
+      padding: 14px;
       border: 1px dashed var(--gold);
       border-radius: 8px;
       background: rgba(245, 158, 11, 0.05);
@@ -460,168 +466,117 @@
 
     .reader-bottom-nav {
       display: flex; justify-content: space-between; align-items: center;
-      margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border);
+      margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--border);
     }
 
-    /* CYBER MINI PHONE */
+    /* CYBER MINI PHONE NÚT THU GỌN */
     #phone-fab {
-      position: fixed; bottom: 24px; right: 24px; width: 58px; height: 58px;
+      position: fixed; bottom: 18px; right: 16px; width: 44px; height: 44px;
       border-radius: 50%; background: #0f1620; border: 2px solid var(--neon); color: var(--neon);
-      display: flex; justify-content: center; align-items: center; font-size: 24px;
-      cursor: pointer; box-shadow: 0 0 20px rgba(102, 252, 241, 0.4); z-index: 1000;
-      transition: transform 0.2s;
+      display: flex; justify-content: center; align-items: center; font-size: 20px;
+      cursor: pointer; box-shadow: 0 0 12px rgba(102, 252, 241, 0.35); z-index: 1000;
     }
-    #phone-fab:hover { transform: scale(1.08); }
 
     #cyber-phone {
-      display: none; position: fixed; bottom: 90px; right: 24px; width: 345px; height: 580px;
-      background: #090d12; border: 3px solid #334155; border-radius: 36px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 15px rgba(69, 162, 158, 0.3);
-      z-index: 999; flex-direction: column; overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: none; position: fixed; bottom: 70px; right: 16px; width: 330px; max-width: calc(100vw - 32px); height: 530px;
+      background: #090d12; border: 2px solid #334155; border-radius: 28px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8); z-index: 999; flex-direction: column; overflow: hidden;
     }
-    .phone-speaker { width: 60px; height: 4px; background: #334155; border-radius: 2px; margin: 12px auto 6px auto; }
+    .phone-speaker { width: 50px; height: 3px; background: #334155; border-radius: 2px; margin: 10px auto 4px auto; }
     .phone-screen {
-      flex: 1; margin: 4px 10px 10px 10px; background: #111822; border-radius: 24px;
+      flex: 1; margin: 4px 8px 8px 8px; background: #111822; border-radius: 20px;
       border: 1px solid #1f2937; display: flex; flex-direction: column; overflow: hidden; position: relative;
     }
     .phone-status-bar {
-      display: flex; justify-content: space-between; padding: 6px 14px; font-size: 10px;
+      display: flex; justify-content: space-between; padding: 4px 12px; font-size: 9px;
       color: #64748b; font-family: monospace; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    #phone-home-screen { flex: 1; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+    #phone-home-screen { flex: 1; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
     .phone-widgets {
-      background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; border-radius: 12px; padding: 10px; text-align: center;
+      background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; border-radius: 10px; padding: 8px; text-align: center;
     }
-    .widget-level { font-size: 12px; color: var(--neon); font-weight: bold; }
-    .widget-exp-bar { background: #1e293b; height: 6px; border-radius: 3px; margin: 6px 0; overflow: hidden; }
-    .widget-exp-fill { background: var(--neon); height: 100%; width: 30%; transition: width 0.3s; }
-    .widget-currency { font-size: 11px; color: var(--gold); font-weight: bold; }
+    .widget-level { font-size: 11px; color: var(--neon); font-weight: bold; }
+    .widget-exp-bar { background: #1e293b; height: 5px; border-radius: 3px; margin: 5px 0; overflow: hidden; }
+    .widget-exp-fill { background: var(--neon); height: 100%; width: 30%; }
+    .widget-currency { font-size: 10px; color: var(--gold); font-weight: bold; }
 
-    .phone-app-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 10px 0; }
-    .app-icon { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+    .phone-app-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 8px 0; }
+    .app-icon { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
     .app-box {
-      width: 48px; height: 48px; border-radius: 12px; display: flex; justify-content: center;
-      align-items: center; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.15s;
+      width: 44px; height: 44px; border-radius: 10px; display: flex; justify-content: center;
+      align-items: center; font-size: 18px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
-    .app-icon:active .app-box { transform: scale(0.9); }
-    .app-label { font-size: 10px; color: #cbd5e1; }
+    .app-label { font-size: 9px; color: #cbd5e1; }
 
     .phone-sub-app {
-      display: none; flex: 1; flex-direction: column; padding: 12px; overflow-y: auto; font-size: 13px; color: #e2e8f0;
+      display: none; flex: 1; flex-direction: column; padding: 10px; overflow-y: auto; font-size: 12px; color: #e2e8f0;
     }
     .phone-app-header {
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 6px;
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 4px;
       border-bottom: 1px solid #334155; color: var(--neon); font-weight: bold;
     }
     .phone-back-btn { background: none; border: none; color: var(--neon); font-size: 14px; cursor: pointer; }
 
     .item-card, .character-card {
-      background: #1a2230; border: 1px solid #334155; border-radius: 8px; padding: 8px; margin-bottom: 8px;
+      background: #1a2230; border: 1px solid #334155; border-radius: 8px; padding: 8px; margin-bottom: 6px;
       display: flex; gap: 8px; align-items: center;
     }
-    .item-card:hover { border-color: var(--accent); }
-
     .quest-card {
-      background: #151e2b;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      background: #151e2b; border: 1px solid #334155; border-radius: 8px; padding: 8px; margin-bottom: 8px;
+      display: flex; flex-direction: column; gap: 4px;
     }
-    .quest-card.ready-claim {
-      border-color: var(--gold);
-      box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
-    }
-    .quest-card.completed {
-      opacity: 0.6;
-      border-color: #1e293b;
-    }
-    .quest-type-tag {
-      font-size: 9px;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .quest-type-MAIN { background: #dc2626; color: #fff; }
-    .quest-type-DAILY { background: #0284c7; color: #fff; }
-    .quest-type-HIDDEN { background: #9333ea; color: #fff; }
+    .quest-card.ready-claim { border-color: var(--gold); }
+    .quest-card.completed { opacity: 0.6; border-color: #1e293b; }
 
-    .quest-prog-bar {
-      background: #0f172a;
-      height: 6px;
-      border-radius: 3px;
-      overflow: hidden;
-      margin: 4px 0;
-    }
-    .quest-prog-fill {
-      background: var(--neon);
-      height: 100%;
-      transition: width 0.3s;
-    }
-
-    .phone-home-bar { width: 80px; height: 4px; background: #475569; border-radius: 2px; margin: 6px auto; cursor: pointer; }
-
-    /* ZEN MODE */
-    .zen-active {
-      position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
-      width: 100vw !important; height: 100vh !important; max-width: 100vw !important; max-height: 100vh !important;
-      border-radius: 0 !important; z-index: 2000 !important; border: none !important;
-    }
-    .zen-active textarea { height: calc(100vh - 220px) !important; font-size: 18px !important; }
+    .phone-home-bar { width: 70px; height: 4px; background: #475569; border-radius: 2px; margin: 6px auto; cursor: pointer; }
 
     /* MODAL */
     .modal-overlay {
       display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
-      z-index: 1200; justify-content: center; align-items: center; padding: 16px;
+      z-index: 1200; justify-content: center; align-items: center; padding: 14px;
     }
     .modal-card {
       background: var(--card-bg); border: 1px solid var(--accent); border-radius: 12px;
-      width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; padding: 20px;
-      display: flex; flex-direction: column; gap: 14px; transition: all 0.3s;
+      width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; padding: 16px;
+      display: flex; flex-direction: column; gap: 10px;
     }
-    .modal-card h2 { color: var(--neon); font-size: 18px; }
-    .modal-field { display: flex; flex-direction: column; gap: 6px; }
-    .modal-field label { font-size: 12px; color: var(--text-dim); }
+    .modal-card h2 { color: var(--neon); font-size: 16px; }
+    .modal-field { display: flex; flex-direction: column; gap: 4px; }
+    .modal-field label { font-size: 11px; color: var(--text-dim); }
     .modal-field input, .modal-field textarea, .modal-field select {
       background: var(--bg-main); border: 1px solid var(--border); border-radius: 6px;
-      padding: 10px; color: var(--text); font-family: inherit; outline: none;
+      padding: 8px 10px; color: var(--text); font-family: inherit; outline: none; font-size: 13px;
     }
-    .word-counter { font-size: 11px; color: var(--accent); text-align: right; }
+    .word-counter { font-size: 10px; color: var(--accent); text-align: right; }
   </style>
 </head>
 <body>
 
   <div class="reader-progress-bar" id="reading-bar"></div>
 
-  <!-- NÚT ĐIỀU HƯỚNG NỔI KHI CUỘN ĐỌC TRUYỆN -->
+  <!-- NÚT ĐIỀU HƯỚNG NỔI -->
   <div class="floating-reading-controls" id="floating-reading-bar">
     <button class="floating-btn" onclick="goHome()">🏠 Tủ Truyện</button>
     <button class="floating-btn" onclick="goCover()">📑 Mục Lục</button>
-    <button class="floating-btn" onclick="scrollToTop()">▲ Lên Đầu</button>
+    <button class="floating-btn" onclick="scrollToTop()">▲ Đầu Trang</button>
   </div>
 
-  <!-- BANNER THÔNG BÁO HỆ THỐNG -->
+  <!-- THÔNG BÁO HỆ THỐNG -->
   <div id="system-alert-banner">
-    <div style="font-size:11px; color:var(--neon); font-weight:bold; letter-spacing:1px;" id="sys-alert-title">[HỆ THỐNG PHÁT ĐỘNG]</div>
-    <div style="font-size:13px; font-weight:bold; margin-top:2px;" id="sys-alert-body">Nhiệm vụ mới đã mở khóa!</div>
+    <div style="font-size:10px; color:var(--neon); font-weight:bold; letter-spacing:1px;" id="sys-alert-title">[HỆ THỐNG PHÁT ĐỘNG]</div>
+    <div style="font-size:12px; font-weight:bold; margin-top:2px;" id="sys-alert-body">Nhiệm vụ mới đã mở khóa!</div>
   </div>
 
   <header>
     <div class="brand" onclick="goHome()">
       <span>✦ DUDU STUDIO</span>
-      <span class="cloud-status" id="cloud-indicator">☁️ Đang kết nối...</span>
     </div>
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <span class="user-info-badge" id="account-status-btn" onclick="openAuthModal()" title="Bấm để đổi tài khoản">👤 Khách</span>
-      <span class="role-badge reader" id="role-toggle-btn" onclick="toggleUserRole()" title="Nhấn để đổi quyền Tác giả / Độc giả">📖 Độc Giả</span>
-      <button class="btn btn-primary admin-only" onclick="openStoryModal()">+ Tạo tác phẩm</button>
+    <div class="header-controls">
+      <span class="cloud-status" id="cloud-indicator">☁️ Đã đồng bộ</span>
+      <span class="user-info-badge" id="account-status-btn" onclick="openAuthModal()">👤 Khách</span>
+      <span class="role-badge reader" id="role-toggle-btn" onclick="toggleUserRole()">📖 Độc Giả</span>
+      <button class="btn btn-primary admin-only" onclick="openStoryModal()">+ Tạo</button>
     </div>
   </header>
 
@@ -630,31 +585,29 @@
     <!-- 1. TỦ TRUYỆN -->
     <div id="home-view">
       
-      <!-- BỘ LỌC TÌM KIẾM, TAG & THỜI GIAN -->
+      <!-- BỘ LỌC TÌM KIẾM TINH GỌN -->
       <div class="filter-panel">
         <div class="search-row">
-          <input type="text" class="search-input" id="search-novel-input" autocomplete="off" placeholder="🔍 Tìm theo tên truyện, nhân vật hoặc nội dung..." oninput="onSearchChange()">
+          <input type="text" class="search-input" id="search-novel-input" autocomplete="off" placeholder="🔍 Tìm tên truyện, nhân vật..." oninput="onSearchChange()">
           <select class="sort-select" id="sort-select-ctrl" onchange="onSortChange()">
-            <option value="NEWEST_UPDATE">⏱ Mới cập nhật nhất</option>
+            <option value="NEWEST_UPDATE">⏱ Mới cập nhật</option>
             <option value="OLDEST_UPDATE">⏳ Cũ nhất</option>
-            <option value="MOST_CHAPTERS">📚 Nhiều chương nhất</option>
-            <option value="MOST_WORDS">🔤 Nhiều chữ nhất</option>
+            <option value="MOST_CHAPTERS">📚 Nhiều chương</option>
+            <option value="MOST_WORDS">🔤 Nhiều chữ</option>
           </select>
         </div>
 
         <div>
-          <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 6px;">Lọc theo Thể loại / Tag:</div>
           <div class="tags-container" id="tag-cloud-container"></div>
         </div>
 
         <div class="filter-status-row">
-          <div style="display: flex; gap: 6px; align-items: center;">
-            <span style="font-size: 11px; color: var(--text-dim);">Trạng thái:</span>
+          <div style="display: flex; gap: 4px; align-items: center;">
             <button class="filter-btn active" onclick="filterStatus('ALL', this)">Tất cả</button>
             <button class="filter-btn" onclick="filterStatus('Đang ra', this)">Đang ra</button>
             <button class="filter-btn" onclick="filterStatus('Hoàn thành', this)">Hoàn thành</button>
           </div>
-          <div style="font-size: 11px; color: var(--accent);" id="search-result-count">Hiển thị 1 truyện</div>
+          <div style="font-size: 10px; color: var(--accent);" id="search-result-count">Hiển thị 2 truyện</div>
         </div>
       </div>
 
@@ -663,13 +616,12 @@
 
     <!-- 2. TRANG BÌA & MỤC LỤC -->
     <div id="cover-view">
-      <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
-        <button class="btn" onclick="goHome()">‹ Về Tủ Truyện</button>
-        <div style="display: flex; gap: 8px;">
-          <!-- NÚT ĐỌC THÔNG MINH TRÊN TRANG BÌA -->
+      <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+        <button class="btn" onclick="goHome()">‹ Tủ Truyện</button>
+        <div style="display: flex; gap: 6px;">
           <button class="btn btn-gold" id="btn-main-reading-action" onclick="smartReadActionCover()">▶ Đọc ngay</button>
-          <button class="btn admin-only" onclick="openEditStoryModal()">✎ Sửa truyện</button>
-          <button class="btn btn-danger admin-only" onclick="deleteCurrentNovel()">Xóa truyện</button>
+          <button class="btn admin-only" onclick="openEditStoryModal()">✎ Sửa</button>
+          <button class="btn btn-danger admin-only" onclick="deleteCurrentNovel()">Xóa</button>
         </div>
       </div>
 
@@ -681,28 +633,25 @@
           <div class="book-stats">
             <span>Tác giả: <b id="book-author" style="color:var(--text-white)">Tôi</b></span>
             <span>Trạng thái: <b id="book-status" style="color:var(--neon)">Đang ra</b></span>
-            <span>Tổng số: <b id="book-chapter-count">0 chương</b></span>
-            <span>Tổng chữ: <b id="book-word-count">0 chữ</b></span>
+            <span>Số chương: <b id="book-chapter-count">0</b></span>
           </div>
-          <p style="font-size: 14px; color: var(--text); line-height: 1.6;" id="book-desc">Tóm tắt tác phẩm...</p>
+          <p style="font-size: 12px; color: var(--text); line-height: 1.5;" id="book-desc">Tóm tắt tác phẩm...</p>
         </div>
       </div>
 
-      <!-- KHUNG VĂN ÁN -->
       <div class="intro-terminal-box">
         <div class="intro-header">
           <span id="intro-box-title">◆ VĂN ÁN // GLITCH RECORD</span>
-          <span class="glitch-text" id="intro-box-code" style="font-family:monospace; cursor:pointer;" title="Nhấp để giải mã" onclick="triggerEasterEgg()">SYS_ERR_0x000F89</span>
+          <span class="glitch-text" id="intro-box-code" style="font-family:monospace; cursor:pointer;" onclick="triggerEasterEgg()">SYS_ERR_0x000F89</span>
         </div>
         <div class="intro-text" id="book-intro">[ Chưa có văn án ]</div>
       </div>
 
-      <!-- MỤC LỤC -->
       <div class="index-toolbar">
-        <div style="font-size: 18px; font-weight: bold; color: var(--text-white);">Mục Lục Chương</div>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn" onclick="toggleChapterOrder()">Đảo thứ tự ⇅</button>
-          <button class="btn btn-primary admin-only" onclick="openCreateChapterModal()">+ Viết chương mới</button>
+        <div style="font-size: 15px; font-weight: bold; color: var(--text-white);">Mục Lục</div>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn" onclick="toggleChapterOrder()">Đảo ⇅</button>
+          <button class="btn btn-primary admin-only" onclick="openCreateChapterModal()">+ Thêm chương</button>
         </div>
       </div>
       <div class="chapter-items" id="chapter-list-container"></div>
@@ -712,10 +661,9 @@
     <div id="reader-view">
       <div class="reader-top-nav">
         <button class="btn" onclick="goCover()">‹ Mục lục</button>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 13px; color: var(--accent);" id="reader-book-name">Tên Truyện</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
           <button class="btn" onclick="openPhoneApp('settings'); togglePhone();">⚙️ Cài đặt</button>
-          <button class="btn admin-only" onclick="editCurrentReadingChapter()">✎ Sửa chương</button>
+          <button class="btn admin-only" onclick="editCurrentReadingChapter()">✎ Sửa</button>
         </div>
       </div>
 
@@ -723,30 +671,28 @@
       <div class="reading-time-badge" id="reader-ch-time">⏱ Khoảng 1 phút đọc</div>
       <div class="reader-body" id="reader-content"></div>
 
-      <!-- HỘP RƠI BẢO VẬT HỆ THỐNG: KHÓA CHẶT CHỐNG BUG NHẬN NHIỀU LẦN -->
       <div class="reader-loot-box">
-        <div style="font-size: 13px; font-weight: bold; color: var(--gold); margin-bottom: 6px;">🎁 TÀN TÍCH DỮ LIỆU CUỐI CHƯƠNG</div>
-        <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 10px;" id="reader-loot-desc">Mỗi chương truyện chỉ chứa 1 mảnh tàn tích dữ liệu duy nhất.</p>
+        <div style="font-size: 12px; font-weight: bold; color: var(--gold); margin-bottom: 4px;">🎁 TÀN TÍCH DỮ LIỆU CUỐI CHƯƠNG</div>
+        <p style="font-size: 10px; color: var(--text-dim); margin-bottom: 8px;" id="reader-loot-desc">Mỗi chương truyện chỉ chứa 1 mảnh tàn tích dữ liệu duy nhất.</p>
         <button class="btn btn-primary" id="btn-chapter-loot-claim" onclick="claimChapterLootDrop()">🎲 Lục Lọi Bảo Vật Ngay</button>
       </div>
 
-      <!-- LỜI NHẮN TÁC GIẢ -->
       <div class="author-note-box" id="reader-author-note-box" style="display:none;">
         <div class="author-note-title">Lời nhắn tác giả:</div>
         <div id="reader-author-note-content"></div>
       </div>
 
       <div class="reader-bottom-nav">
-        <button class="btn" id="btn-prev-ch" onclick="prevChapter()">‹ [←] Chương trước</button>
+        <button class="btn" id="btn-prev-ch" onclick="prevChapter()">‹ Trước</button>
         <button class="btn" onclick="goCover()">Mục lục</button>
-        <button class="btn" id="btn-next-ch" onclick="nextChapter()">Chương sau [→] ›</button>
+        <button class="btn" id="btn-next-ch" onclick="nextChapter()">Sau ›</button>
       </div>
     </div>
 
   </div>
 
   <!-- CYBER MINI PHONE -->
-  <div id="phone-fab" onclick="togglePhone()" title="Mở Hệ Thống Cyber Phone [P]">📱</div>
+  <div id="phone-fab" onclick="togglePhone()" title="Hệ Thống [P]">📱</div>
 
   <div id="cyber-phone">
     <div class="phone-speaker"></div>
@@ -762,7 +708,7 @@
           <div class="widget-exp-bar">
             <div class="widget-exp-fill" id="phone-exp-fill"></div>
           </div>
-          <div style="display:flex; justify-content:space-between; font-size:10px; color:#64748b;">
+          <div style="display:flex; justify-content:space-between; font-size:9px; color:#64748b;">
             <span id="phone-exp-text">EXP: 0 / 100</span>
             <span class="widget-currency" id="phone-currency-display">🪙 50 Xu</span>
           </div>
@@ -795,7 +741,7 @@
           </div>
         </div>
 
-        <div style="text-align: center; font-size: 10px; color: #475569;">DUDU LINK SYSTEM ONLINE</div>
+        <div style="text-align: center; font-size: 9px; color: #475569;">DUDU LINK SYSTEM ONLINE</div>
       </div>
 
       <!-- APP: HỒ SƠ -->
@@ -805,18 +751,17 @@
           <span>Hồ Sơ Danh Tính</span>
           <span></span>
         </div>
-        <div style="text-align: center; margin-bottom: 12px;">
-          <div style="font-size: 38px;">🧙‍♂️</div>
-          <div style="font-weight: bold; color: var(--neon); font-size: 15px;" id="profile-name">Kẻ Lang Bạt</div>
-          <div style="font-size: 11px; color: #64748b;" id="profile-title">Người Thao Túng Mã Nguồn</div>
-          <div style="font-size: 10px; color: var(--gold); margin-top: 4px;" id="profile-account-id">ID: Khách</div>
+        <div style="text-align: center; margin-bottom: 10px;">
+          <div style="font-size: 32px;">🧙‍♂️</div>
+          <div style="font-weight: bold; color: var(--neon); font-size: 14px;" id="profile-name">Kẻ Lang Bạt</div>
+          <div style="font-size: 10px; color: #64748b;" id="profile-title">Người Thao Túng Mã Nguồn</div>
+          <div style="font-size: 9px; color: var(--gold); margin-top: 2px;" id="profile-account-id">ID: Khách</div>
         </div>
-        <div style="background: #1e293b; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 10px;">
+        <div style="background: #1e293b; padding: 8px; border-radius: 8px; font-size: 11px; margin-bottom: 8px;">
           <div>📚 Số truyện: <b id="stat-novels" style="color:var(--neon)">1</b></div>
-          <div style="margin-top: 4px;">📝 Tổng chương: <b id="stat-chapters" style="color:var(--neon)">1</b></div>
-          <div style="margin-top: 4px;">🔤 Tổng từ đã viết: <b id="stat-total-words" style="color:var(--neon)">0</b></div>
+          <div style="margin-top: 2px;">📝 Tổng chương: <b id="stat-chapters" style="color:var(--neon)">1</b></div>
         </div>
-        <button class="btn" style="width: 100%; font-size: 11px;" onclick="openAuthModal()">Đổi Tài Khoản / Đăng Xuất</button>
+        <button class="btn" style="width: 100%; font-size: 10px;" onclick="openAuthModal()">Đổi Tài Khoản / Đăng Xuất</button>
       </div>
 
       <!-- APP: KHO ĐỒ -->
@@ -824,10 +769,10 @@
         <div class="phone-app-header">
           <button class="phone-back-btn" onclick="phoneHome()">‹</button>
           <span>Kho Đồ Kẻ Lang Bạt</span>
-          <button class="btn" id="btn-inventory-loot" style="padding: 2px 8px; font-size: 10px;" onclick="rollLootDrop(false)">🎲 Nhặt đồ</button>
+          <button class="btn" id="btn-inventory-loot" style="padding: 2px 7px; font-size: 9px;" onclick="rollLootDrop(false)">🎲 Nhặt đồ</button>
         </div>
         
-        <div style="display:flex; gap:4px; margin-bottom:10px;">
+        <div style="display:flex; gap:4px; margin-bottom:8px;">
           <button class="filter-btn active" id="inv-tab-all" onclick="filterInventory('ALL', this)">Tất cả</button>
           <button class="filter-btn" id="inv-tab-food" onclick="filterInventory('FOOD', this)">Đồ ăn</button>
           <button class="filter-btn" id="inv-tab-weapon" onclick="filterInventory('WEAPON', this)">Vũ khí</button>
@@ -841,14 +786,13 @@
         <div class="phone-app-header">
           <button class="phone-back-btn" onclick="phoneHome()">‹</button>
           <span>Nhiệm Vụ Hệ Thống</span>
-          <button class="btn" style="padding: 2px 6px; font-size: 9px;" onclick="refreshDailyQuests()">🔄 Làm mới</button>
+          <button class="btn" style="padding: 2px 5px; font-size: 9px;" onclick="refreshDailyQuests()">🔄 Reset</button>
         </div>
         
-        <div style="display:flex; gap:4px; margin-bottom:10px;">
+        <div style="display:flex; gap:4px; margin-bottom:8px;">
           <button class="filter-btn active" onclick="filterQuestTab('ALL', this)">Tất cả</button>
           <button class="filter-btn" onclick="filterQuestTab('DAILY', this)">Hàng ngày</button>
           <button class="filter-btn" onclick="filterQuestTab('MAIN', this)">Chính tuyến</button>
-          <button class="filter-btn" onclick="filterQuestTab('HIDDEN', this)">Ẩn</button>
         </div>
 
         <div id="quests-container"></div>
@@ -858,26 +802,25 @@
       <div class="phone-sub-app" id="phone-app-shop">
         <div class="phone-app-header">
           <button class="phone-back-btn" onclick="phoneHome()">‹</button>
-          <span>Cửa Hàng Xu Ký Tự</span>
+          <span>Cửa Hàng Xu</span>
           <span></span>
         </div>
-        <div style="font-size:11px; color:var(--gold); margin-bottom:8px;">Số dư: <b id="shop-currency-val">50</b> 🪙 Xu</div>
+        <div style="font-size:10px; color:var(--gold); margin-bottom:6px;">Số dư: <b id="shop-currency-val">50</b> 🪙 Xu</div>
         <div id="shop-items-container"></div>
       </div>
 
       <!-- APP: SỔ TAY NHÂN VẬT -->
       <div class="phone-sub-app" id="phone-app-codex">
         <div class="phone-app-header">
-          <div style="display:flex; align-items:center; gap:6px;">
+          <div style="display:flex; align-items:center; gap:4px;">
             <button class="phone-back-btn" onclick="phoneHome()">‹</button>
-            <span>Sổ Tay Nhân Vật</span>
+            <span>Nhân Vật</span>
           </div>
-          <button class="btn admin-only" style="padding: 2px 8px; font-size: 10px;" onclick="openAddCharacterModal()">+ Thêm</button>
+          <button class="btn admin-only" style="padding: 2px 6px; font-size: 9px;" onclick="openAddCharacterModal()">+ Thêm</button>
         </div>
 
-        <div style="margin-bottom: 10px;">
-          <label style="font-size: 10px; color: #94a3b8;">Chọn truyện:</label>
-          <select id="codex-novel-selector" onchange="renderCodexList()" style="width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px; color: #fff; font-size: 11px; margin-top: 3px; outline: none;"></select>
+        <div style="margin-bottom: 8px;">
+          <select id="codex-novel-selector" onchange="renderCodexList()" style="width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 4px; color: #fff; font-size: 10px; outline: none;"></select>
         </div>
 
         <div id="codex-container"></div>
@@ -887,34 +830,24 @@
       <div class="phone-sub-app" id="phone-app-settings">
         <div class="phone-app-header">
           <button class="phone-back-btn" onclick="phoneHome()">‹</button>
-          <span>Tùy Biến Đọc Sách</span>
+          <span>Cài Đặt</span>
           <span></span>
         </div>
-        <div style="margin-bottom: 14px;">
-          <label style="font-size: 11px; color: #94a3b8;">Cỡ chữ đọc:</label>
-          <div style="display: flex; gap: 8px; margin-top: 4px;">
-            <button class="btn" style="flex:1" onclick="setReadingFontSize(16)">16px</button>
-            <button class="btn" style="flex:1" onclick="setReadingFontSize(18)">18px</button>
-            <button class="btn" style="flex:1" onclick="setReadingFontSize(21)">21px</button>
+        <div style="margin-bottom: 10px;">
+          <label style="font-size: 10px; color: #94a3b8;">Cỡ chữ đọc:</label>
+          <div style="display: flex; gap: 6px; margin-top: 3px;">
+            <button class="btn" style="flex:1; padding:3px;" onclick="setReadingFontSize(16)">16px</button>
+            <button class="btn" style="flex:1; padding:3px;" onclick="setReadingFontSize(18)">18px</button>
+            <button class="btn" style="flex:1; padding:3px;" onclick="setReadingFontSize(21)">21px</button>
           </div>
         </div>
-        <div style="margin-bottom: 14px;">
-          <label style="font-size: 11px; color: #94a3b8;">Kiểu font:</label>
-          <div style="display: flex; gap: 8px; margin-top: 4px;">
-            <button class="btn" style="flex:1" onclick="setReadingFont('sans')">Hiện đại</button>
-            <button class="btn" style="flex:1" onclick="setReadingFont('serif')">Cổ điển</button>
-          </div>
-        </div>
-        <div style="margin-bottom: 14px;">
-          <label style="font-size: 11px; color: #94a3b8;">Chủ đề màu:</label>
-          <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 4px;">
+        <div style="margin-bottom: 10px;">
+          <label style="font-size: 10px; color: #94a3b8;">Chủ đề màu:</label>
+          <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 3px;">
             <button class="btn" onclick="setTheme('default')">Dark Terminal</button>
             <button class="btn" onclick="setTheme('warm')">Warm Paper</button>
             <button class="btn" onclick="setTheme('oled')">OLED Black</button>
           </div>
-        </div>
-        <div class="admin-only" style="margin-top: 10px; border-top: 1px solid #334155; padding-top: 10px;">
-          <button class="btn" style="width: 100%; font-size: 11px;" onclick="exportData()">💾 Tải JSON Dự Phòng</button>
         </div>
       </div>
 
@@ -922,24 +855,20 @@
     </div>
   </div>
 
-  <!-- MODAL: ĐĂNG NHẬP / TẠO TÀI KHOẢN -->
+  <!-- MODAL: ĐĂNG NHẬP -->
   <div class="modal-overlay" id="auth-modal">
-    <div class="modal-card" style="max-width: 400px; text-align: center;">
+    <div class="modal-card" style="max-width: 360px; text-align: center;">
       <h2>🔑 ĐĂNG NHẬP HỆ THỐNG</h2>
-      <p style="font-size: 12px; color: var(--text-dim);">Tạo hoặc đăng nhập tài khoản riêng của thiết bị này để lưu Kho Đồ, Xu, Cấp Độ độc lập.</p>
+      <p style="font-size: 11px; color: var(--text-dim);">Đăng nhập tài khoản riêng để lưu Kho Đồ, Xu, Cấp Độ độc lập.</p>
       
-      <div class="modal-field" style="text-align: left; margin-top: 10px;">
-        <label>Tên đăng nhập (ID người chơi):</label>
+      <div class="modal-field" style="text-align: left; margin-top: 8px;">
+        <label>Tên đăng nhập:</label>
         <input type="text" id="auth-username" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Ví dụ: dudu_phone hoặc reader_pc">
       </div>
-      <div class="modal-field" style="text-align: left;">
-        <label>Mã PIN bảo mật (Tùy chọn):</label>
-        <input type="password" id="auth-pin" autocomplete="off" placeholder="Ví dụ: 1234">
-      </div>
 
-      <div style="display: flex; gap: 10px; margin-top: 14px;">
+      <div style="display: flex; gap: 8px; margin-top: 10px;">
         <button class="btn" style="flex:1" onclick="closeModals()">Đóng</button>
-        <button class="btn btn-primary" style="flex:1" onclick="handleAuthSubmit()">Vào Hệ Thống</button>
+        <button class="btn btn-primary" style="flex:1" onclick="handleAuthSubmit()">Xác Nhận</button>
       </div>
     </div>
   </div>
@@ -953,16 +882,16 @@
         <input type="text" id="story-modal-title" autocomplete="off" placeholder="Ví dụ: truyện điên vl">
       </div>
       <div class="modal-field">
-        <label>Ảnh bìa truyện (Dán link URL hoặc chọn file từ máy):</label>
-        <input type="text" id="story-modal-cover-url" autocomplete="off" placeholder="Dán đường link ảnh bìa (https://...)...">
-        <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+        <label>Ảnh bìa truyện:</label>
+        <input type="text" id="story-modal-cover-url" autocomplete="off" placeholder="Dán link ảnh bìa...">
+        <div style="display:flex; align-items:center; gap:6px; margin-top:3px;">
           <input type="file" id="story-modal-cover-file" accept="image/*" onchange="handleCoverFileUpload(event)">
         </div>
         <input type="hidden" id="story-modal-cover-base64">
       </div>
       <div class="modal-field">
         <label>Thể loại / Tags (Ngăn cách bằng dấu phẩy):</label>
-        <input type="text" id="story-modal-genre" autocomplete="off" placeholder="Vô hạn lưu, Hệ thống, Glitch, Kinh dị, Xuyên nhanh...">
+        <input type="text" id="story-modal-genre" autocomplete="off" placeholder="Vô hạn lưu, Hệ thống, Glitch, Kinh dị...">
       </div>
       <div class="modal-field">
         <label>Trạng thái:</label>
@@ -973,48 +902,48 @@
         </select>
       </div>
       <div class="modal-field">
-        <label>Tóm tắt ngắn (Hiện ngoài bìa):</label>
+        <label>Tóm tắt ngắn:</label>
         <input type="text" id="story-modal-desc" autocomplete="off" placeholder="Tóm tắt ngắn gọn...">
       </div>
       <div class="modal-field">
-        <label>Khung văn án mở đầu (Terminal glitch):</label>
-        <textarea id="story-modal-intro" autocomplete="off" style="height: 100px;" placeholder="Mã nguồn lỗi, trích dẫn bối cảnh..."></textarea>
+        <label>Khung văn án mở đầu (Glitch record):</label>
+        <textarea id="story-modal-intro" autocomplete="off" style="height: 80px;" placeholder="Mã nguồn lỗi, trích dẫn bối cảnh..."></textarea>
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
         <button class="btn" onclick="closeModals()">Hủy</button>
-        <button class="btn btn-primary" onclick="saveStoryModal()">Lưu Tác Phẩm</button>
+        <button class="btn btn-primary" onclick="saveStoryModal()">Lưu</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: TẠO / SỬA CHƯƠNG (ĐÃ TẮT HOÀN TOÀN AUTOCOMPLETE GỢI Ý CHƯƠNG CŨ) -->
+  <!-- MODAL: VIẾT CHƯƠNG (KHÓA HOÀN TOÀN AUTOCOMPLETE GỢI Ý CHƯƠNG CŨ) -->
   <div class="modal-overlay" id="chapter-modal">
     <div class="modal-card" id="chapter-modal-card">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h2 id="chapter-modal-heading">VIẾT CHƯƠNG MỚI</h2>
-        <button class="btn" onclick="toggleZenMode()">⛶ Zen Mode</button>
+        <button class="btn" onclick="toggleZenMode()">⛶ Zen</button>
       </div>
       <div class="modal-field">
         <label>Tên chương:</label>
-        <input type="text" id="chapter-modal-title" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Ví dụ: Chương 1: Khoảng Trắng Của Kẻ Lang Bạt">
+        <input type="text" id="chapter-modal-title" name="new_chapter_title_custom" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Ví dụ: Chương 1: Khoảng Trắng Của Kẻ Lang Bạt">
       </div>
       <div class="modal-field">
         <label>Nội dung chương:</label>
-        <textarea id="chapter-modal-content" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="height: 240px;" oninput="onChapterInput()" placeholder="Dán nội dung chương vào đây..."></textarea>
+        <textarea id="chapter-modal-content" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="height: 220px;" oninput="onChapterInput()" placeholder="Dán nội dung chương vào đây..."></textarea>
         <div class="word-counter" id="ch-word-preview">0 từ</div>
       </div>
       <div class="modal-field">
-        <label>Lời nhắn của tác giả ở cuối chương (Author Note):</label>
-        <input type="text" id="chapter-modal-author-note" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Lời bình hoặc thông báo ra chương tiếp...">
+        <label>Lời nhắn của tác giả:</label>
+        <input type="text" id="chapter-modal-author-note" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Lời bình hoặc thông báo...">
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
         <button class="btn" onclick="closeModals()">Hủy</button>
         <button class="btn btn-primary" onclick="saveChapterModal()">Lưu Nội Dung</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: THÊM / SỬA NHÂN VẬT -->
+  <!-- MODAL: NHÂN VẬT -->
   <div class="modal-overlay" id="char-modal">
     <div class="modal-card">
       <h2 id="char-modal-heading">THÊM NHÂN VẬT MỚI</h2>
@@ -1023,25 +952,32 @@
         <input type="text" id="char-input-name" autocomplete="off" placeholder="Ví dụ: Ôn Tri Hành">
       </div>
       <div class="modal-field">
-        <label>Vai trò / Thân phận:</label>
-        <input type="text" id="char-input-role" autocomplete="off" placeholder="Ví dụ: Nhân vật chính, Đồng hành, Cố nhân...">
+        <label>Vai trò:</label>
+        <input type="text" id="char-input-role" autocomplete="off" placeholder="Nhân vật chính, Cố nhân...">
       </div>
       <div class="modal-field">
-        <label>Trạng thái hiện tại:</label>
-        <input type="text" id="char-input-status" autocomplete="off" placeholder="Ví dụ: Còn sống, Đã chết, Mất kết nối, Bị phong tỏa...">
+        <label>Trạng thái:</label>
+        <input type="text" id="char-input-status" autocomplete="off" placeholder="Còn sống, Mất kết nối...">
       </div>
       <div class="modal-field">
-        <label>Ghi chú / Mô tả đặc điểm:</label>
-        <textarea id="char-input-note" autocomplete="off" style="height: 80px;" placeholder="Ghi chú về tính cách, ký ức hoặc manh mối..."></textarea>
+        <label>Ghi chú:</label>
+        <textarea id="char-input-note" autocomplete="off" style="height: 70px;" placeholder="Ghi chú thêm..."></textarea>
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
         <button class="btn" onclick="closeModals()">Hủy</button>
-        <button class="btn btn-primary" onclick="saveCharacterModal()">Lưu Nhân Vật</button>
+        <button class="btn btn-primary" onclick="saveCharacterModal()">Lưu</button>
       </div>
     </div>
   </div>
 
   <script>
+    // ĐĂNG KÝ SERVICE WORKER CHO PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch((err) => console.log('SW error:', err));
+      });
+    }
+
     const firebaseConfig = {
       apiKey: "AIzaSyCzZF18xI8nM1TLqR1q3x7HxZYE-0_VMtk",
       authDomain: "truyendienvl.firebaseapp.com",
@@ -1056,7 +992,6 @@
     const db = firebase.firestore();
     const docRef = db.collection("studio_data").doc("main_library");
 
-    // ÂM THANH SYNTH
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playTone(freq, duration, type = 'sine') {
       try {
@@ -1086,50 +1021,36 @@
       document.getElementById('sys-alert-title').textContent = title;
       document.getElementById('sys-alert-body').textContent = message;
       banner.style.display = 'block';
-      setTimeout(() => { banner.style.display = 'none'; }, 3200);
+      setTimeout(() => { banner.style.display = 'none'; }, 2800);
     }
 
-    // DANH MỤC BẢO VẬT TỔNG
     const MASTER_LOOT_TABLE = [
-      { id: "f1", name: "Mẩu Bánh Mì Mốc", rank: "F", type: "FOOD", icon: "🍞", desc: "Khô khốc, nhưng có thể chống đói lúc tuyệt vọng." },
+      { id: "f1", name: "Mẩu Bánh Mì Mốc", rank: "F", type: "FOOD", icon: "🍞", desc: "Khô khốc, nhưng chống đói lúc tuyệt vọng." },
       { id: "f2", name: "Chai Nước Suối Dở", rank: "F", type: "FOOD", icon: "🧴", desc: "Còn sót lại vài giọt nước khoáng ấm." },
-      { id: "f3", name: "Bao Diêm Ướt Nước", rank: "F", type: "ITEM", icon: "🪵", desc: "Kỷ vật từ một đêm mưa gió ở Thượng Hải." },
-      { id: "e1", name: "Mì Tôm Cay Dung Thành", rank: "E", type: "FOOD", icon: "🍜", desc: "Món ăn rẻ tiền quen thuộc thời còn ở phòng net." },
-      { id: "e2", name: "Lon Cà Phê Đen", rank: "E", type: "FOOD", icon: "☕", desc: "Giúp đầu óc tỉnh táo giữa các luồng dữ liệu rối loạn." },
-      { id: "e3", name: "Dao Gọt Trái Cây Cũ", rank: "E", type: "WEAPON", icon: "🔪", desc: "Vũ khí thô sơ nhất để tự vệ trước dị thể cấp thấp." },
-      { id: "d1", name: "Hộp Bò Hầm Quân Dụng", rank: "D", type: "FOOD", icon: "🥫", desc: "Bổ sung lượng calo lớn trong các phó bản kéo dài." },
-      { id: "d2", name: "Bật Lửa Kim Loại Zippo", rank: "D", type: "ITEM", icon: "🔥", desc: "Tia lửa ấm áp xua tan cái lạnh không gian trắng." },
-      { id: "d3", name: "Gậy Bóng Chày Gia Cố", rank: "D", type: "WEAPON", icon: "🏏", desc: "Bọc dây kẽm gai ở đầu, sức công phá ổn định." },
-      { id: "c1", name: "Dao Găm Quân Đội M9", rank: "C", type: "WEAPON", icon: "🗡️", desc: "Lưỡi thép đen bén ngọt, thiết kế chuẩn cận chiến." },
-      { id: "c2", name: "Súng Lục Bán Tự Động", rank: "C", type: "WEAPON", icon: "🔫", desc: "Uy lực tầm gần, phát ra âm thanh khô khốc." },
-      { id: "c3", name: "Bộ Sơ Cứu Khẩn Cấp", rank: "C", type: "ITEM", icon: "🩹", desc: "Gạc vô trùng và cồn đỏ khử khuẩn vết thương." },
-      { id: "b1", name: "Súng Trường Tấn Công", rank: "B", type: "WEAPON", icon: "⚡", desc: "Băng đạn 30 viên, uy lực quét sạch đàn quái cấp thấp." },
-      { id: "b2", name: "Kiếm Katana Thép Đen", rank: "B", type: "WEAPON", icon: "⚔️", desc: "Rèn từ quặng thép đặc biệt, chém đứt kim loại mỏng." },
-      { id: "b3", name: "Khẩu Phần Ăn Sinh Lực", rank: "B", type: "FOOD", icon: "🥩", desc: "Thịt hun khói cao cấp tẩm gia vị phục hồi thể lực." },
-      { id: "a1", name: "Huyết Thanh Thể Phách", rank: "A", type: "FOOD", icon: "🧪", desc: "Tăng cường độ phản xạ và cảm tri thực tại." },
-      { id: "a2", name: "Kiếm Gãy Thanh Sương", rank: "A", type: "WEAPON", icon: "🗡️", desc: "Cổ vật mang tàn dư kiếm khí, dù gãy vẫn sắc bén." },
+      { id: "e1", name: "Mì Tôm Cay Dung Thành", rank: "E", type: "FOOD", icon: "🍜", desc: "Món ăn quen thuộc thời còn ở phòng net." },
+      { id: "e2", name: "Lon Cà Phê Đen", rank: "E", type: "FOOD", icon: "☕", desc: "Tỉnh táo giữa luồng dữ liệu rối loạn." },
+      { id: "e3", name: "Dao Gọt Trái Cây Cũ", rank: "E", type: "WEAPON", icon: "🔪", desc: "Vũ khí thô sơ nhất để tự vệ." },
+      { id: "d1", name: "Hộp Bò Hầm Quân Dụng", rank: "D", type: "FOOD", icon: "🥫", desc: "Bổ sung lượng calo lớn trong phó bản." },
+      { id: "c1", name: "Dao Găm Quân Đội M9", rank: "C", type: "WEAPON", icon: "🗡️", desc: "Lưỡi thép đen bén ngọt chuẩn cận chiến." },
+      { id: "b1", name: "Súng Trường Tấn Công", rank: "B", type: "WEAPON", icon: "⚡", desc: "Băng đạn 30 viên quét sạch quái cấp thấp." },
+      { id: "b2", name: "Kiếm Katana Thép Đen", rank: "B", type: "WEAPON", icon: "⚔️", desc: "Rèn từ quặng thép đặc biệt." },
       { id: "s1", name: "Súng Bắn Tỉa Phân Rã", rank: "S", type: "WEAPON", icon: "🔭", desc: "Bắn ra chùm hạt làm tan rã cấu trúc vật chất." },
-      { id: "s2", name: "Lưỡi Hái Kẻ Lang Bạt", rank: "S", type: "WEAPON", icon: "💀", desc: "Cắt đứt sợi dây liên kết giữa linh hồn và phó bản." },
-      { id: "ss1", name: "Trái Tim Lõi Dung Thành", rank: "SS", type: "ITEM", icon: "💎", desc: "Mảnh vụn ký ức chứa nguồn năng lượng vô tận." },
-      { id: "sss1", name: "Mã Nguồn SYS_ERR_0x000F89", rank: "SSS", type: "ITEM", icon: "🌌", desc: "Quyền năng tối cao thao túng quy tắc vũ trụ DUDU." }
+      { id: "sss1", name: "Mã Nguồn SYS_ERR_0x000F89", rank: "SSS", type: "ITEM", icon: "🌌", desc: "Quyền năng tối cao thao túng quy tắc DUDU." }
     ];
 
     const SHOP_CATALOG = [
       { id: "shop-food-1", name: "Lon Cà Phê Phòng Net", rank: "E", price: 10, icon: "☕", type: "FOOD", desc: "Hồi phục tinh thần đọc truyện." },
       { id: "shop-food-2", name: "Hộp Bò Hầm Quân Dụng", rank: "D", price: 25, icon: "🥫", type: "FOOD", desc: "Lương khô sinh tồn cao cấp." },
       { id: "shop-wpn-1", name: "Dao Găm Quân Đội M9", rank: "C", price: 40, icon: "🗡️", type: "WEAPON", desc: "Vũ khí cận chiến sắc bén." },
-      { id: "shop-wpn-2", name: "Súng Lục Bán Tự Động", rank: "C", price: 65, icon: "🔫", type: "WEAPON", desc: "Trang bị tự vệ tầm gần." },
-      { id: "shop-wpn-3", name: "Kiếm Katana Thép Đen", rank: "B", price: 120, icon: "⚔️", type: "WEAPON", desc: "Vũ khí chuyên dụng diệt dị thể." },
-      { id: "shop-sss", name: "Mảnh Vỡ Quy Tắc 0x000F89", rank: "SSS", price: 300, icon: "🌌", type: "ITEM", desc: "Vật phẩm tối thượng của hệ thống." }
+      { id: "shop-wpn-3", name: "Kiếm Katana Thép Đen", rank: "B", price: 120, icon: "⚔️", type: "WEAPON", desc: "Vũ khí diệt dị thể." },
+      { id: "shop-sss", name: "Mảnh Vỡ 0x000F89", rank: "SSS", price: 300, icon: "🌌", type: "ITEM", desc: "Vật phẩm tối thượng hệ thống." }
     ];
 
     const DEFAULT_SYSTEM_QUESTS = [
-      { id: "q_daily_read", type: "DAILY", title: "Duyệt Đọc Luồng Dữ Liệu", desc: "Đọc tích lũy 2 chương truyện bất kỳ.", current: 0, target: 2, rewardExp: 30, rewardCoin: 25, claimed: false },
-      { id: "q_daily_loot", type: "DAILY", title: "Thu Thập Tàn Tích", desc: "Thực hiện lục lọi hoặc nhặt trang bị 2 lần.", current: 0, target: 2, rewardExp: 25, rewardCoin: 20, claimed: false },
-      { id: "q_main_intro", type: "MAIN", title: "[Chính Tuyến] Bước Chân Vào Không Gian Trắng", desc: "Đọc trọn vẹn Chương 1 của truyện điên vl.", current: 0, target: 1, rewardExp: 50, rewardCoin: 50, claimed: false },
-      { id: "q_main_write", type: "MAIN", title: "[Chính Tuyến] Thiết Lập Bản Đồ Thế Giới", desc: "Tự tạo hoặc sửa thêm 1 chương truyện mới.", current: 0, target: 1, rewardExp: 60, rewardCoin: 60, claimed: false },
-      { id: "q_hidden_glitch", type: "HIDDEN", title: "[Nhiệm Vụ Ẩn] Khởi Động Mã Lệnh Lỗi", desc: "Chạm vào mã glitch SYS_ERR_0x000F89.", current: 0, target: 1, rewardExp: 80, rewardCoin: 100, claimed: false },
-      { id: "q_hidden_codex", type: "HIDDEN", title: "[Nhiệm Vụ Ẩn] Ký Ức Cố Nhân", desc: "Tra cứu hồ sơ Ôn Tri Hành hoặc Tô Thanh Lạc.", current: 0, target: 1, rewardExp: 50, rewardCoin: 40, claimed: false }
+      { id: "q_daily_read", type: "DAILY", title: "Duyệt Đọc Dữ Liệu", desc: "Đọc tích lũy 2 chương truyện bất kỳ.", current: 0, target: 2, rewardExp: 30, rewardCoin: 25, claimed: false },
+      { id: "q_daily_loot", type: "DAILY", title: "Thu Thập Tàn Tích", desc: "Lục lọi hoặc nhặt trang bị 2 lần.", current: 0, target: 2, rewardExp: 25, rewardCoin: 20, claimed: false },
+      { id: "q_main_intro", type: "MAIN", title: "[Chính Tuyến] Bước Vào Không Gian Trắng", desc: "Đọc trọn vẹn Chương 1 của truyện điên vl.", current: 0, target: 1, rewardExp: 50, rewardCoin: 50, claimed: false },
+      { id: "q_main_write", type: "MAIN", title: "[Chính Tuyến] Sáng Tạo Thế Giới", desc: "Tự tạo hoặc sửa thêm 1 chương truyện mới.", current: 0, target: 1, rewardExp: 60, rewardCoin: 60, claimed: false }
     ];
 
     const initialNovels = [
@@ -1145,36 +1066,29 @@
         introData: {
           title: "VĂN ÁN // GLITCH RECORD",
           code: "SYS_ERR_0x000F89",
-          text: `[Lỗi kết nối máy chủ cốt lõi: 0x000F89]\n[Ký ức thực thể: Phong tỏa 68%...]\n[Kho đồ cá nhân: Khóa quyền truy cập (Dữ liệu không đồng bộ)]\n[Chuyển giao mục tiêu: Ngẫu nhiên...]`
+          text: `[Lỗi kết nối máy chủ cốt lõi: 0x000F89]\n[Ký ức thực thể: Phong tỏa 68%...]\n[Kho đồ cá nhân: Khóa quyền truy cập]\n[Chuyển giao mục tiêu: Ngẫu nhiên...]`
         },
         characters: [
           { id: "c1", name: "Tôi", role: "Nhân vật chính", status: "Mảnh vụn dữ liệu lỗi", note: "Linh hồn lang bạt qua hàng ngàn năm tích lũy tri thức." },
-          { id: "c2", name: "Ôn Tri Hành", role: "Cố nhân", status: "Mất kết nối", note: "Bóng hình không còn xuất hiện sau khi hệ thống trục trặc." },
-          { id: "c3", name: "Thẩm Cẩm Thư", role: "Cố nhân", status: "Mất kết nối", note: "Một trong những người từng đi qua đời nhân vật chính." },
-          { id: "c4", name: "Tô Thanh Lạc", role: "Ký ức nhạt nhòa", status: "Bị phong tỏa", note: "Gắn liền với cơn mưa Thượng Hải và phòng net tồi tàn." }
+          { id: "c2", name: "Ôn Tri Hành", role: "Cố nhân", status: "Mất kết nối", note: "Bóng hình không còn xuất hiện sau khi hệ thống trục trặc." }
         ],
         chapters: [
           {
             id: "ch-1",
             title: "Chương 1: Khoảng Trắng Của Kẻ Lang Bạt",
-            content: `Khi nhịp tim cuối cùng ở tầng hầm Dung Thành vụt tắt, tôi không rơi vào bóng tối vĩnh hằng như mình từng mong đợi.\n\nCái chết đối với một kẻ mang linh hồn lang bạt như tôi chưa từng là điểm dừng chân. Nó chỉ là một lần hệ thống trục trặc tự động khởi động lại. Một không gian trắng xóa vô tận, không có trọng lực, không có tiếng thở, và hoàn toàn vắng bóng bóng hình của Ôn Tri Hành hay Thẩm Cẩm Thư. Trước mắt tôi trôi nổi một giao diện bán trong suốt méo mó, nhấp nháy những dòng mã nguồn gãy khúc.\n\nTôi nằm giữa khoảng không vô định ấy, lặng lẽ nhìn những dòng ký tự xanh lam lạnh lẽo. Không có hướng dẫn viên, không có nhiệm vụ rõ ràng, không có phần thưởng. Tôi chỉ là một mảnh vụn dữ liệu bị lỗi văng ra khỏi guồng quay luân hồi.\n\nKý ức về Tô Thanh Lạc, về cơn mưa Thượng Hải, về căn phòng net tồi tàn và những đứa trẻ ở Vạn Yên bỗng chốc mờ nhạt dần, tựa như một lớp sương mù dày đặc phủ lên tấm gương soi. Tôi biết mình từng sống, từng đau, từng tích lũy vô vàn tri thức qua hàng ngàn năm tháng lưu lạc, nhưng gương mặt của những người từng đi qua đời tôi lại biến thành những mảng màu nhòe nhoẹt.`,
+            content: `Khi nhịp tim cuối cùng ở tầng hầm Dung Thành vụt tắt, tôi không rơi vào bóng tối vĩnh hằng như mình từng mong đợi.\n\nCái chết đối với một kẻ mang linh hồn lang bạt như tôi chưa từng là điểm dừng chân. Nó chỉ là một lần hệ thống trục trặc tự động khởi động lại. Một không gian trắng xóa vô tận, không có trọng lực, không có tiếng thở, và hoàn toàn vắng bóng bóng hình của Ôn Tri Hành hay Thẩm Cẩm Thư. Trước mắt tôi trôi nổi một giao diện bán trong suốt méo mó, nhấp nháy những dòng mã nguồn gãy khúc.`,
             createdAt: "2026-10-09",
             updatedAt: "2026-10-09",
-            wordCount: 196,
-            authorNote: "Khởi đầu của một hành trình mới. Cảm ơn bạn đã đọc!"
+            wordCount: 92,
+            authorNote: "Khởi đầu của một hành trình mới."
           }
         ]
       }
     ];
 
     let novels = JSON.parse(localStorage.getItem('my_novels_library_db')) || initialNovels;
-
-    // ==========================================
-    // CƠ CHẾ ĐĂNG NHẬP & PHÂN QUYỀN MẶC ĐỊNH
-    // ==========================================
     let currentUsername = localStorage.getItem('my_current_logged_user') || "";
     
-    // MẶC ĐỊNH LUÔN LÀ "reader" (ĐỘC GIẢ) ĐỂ TRÁNH LỖI UPLOAD ĐÈ
     let userProfile = {
       username: "guest",
       name: "Kẻ Lang Bạt",
@@ -1183,9 +1097,9 @@
       level: 1,
       currency: 50,
       role: "reader", 
-      lootedChapters: {}, // LƯU DANH SÁCH CHƯƠNG ĐÃ NHẶT (CHỐNG BUG NHẬN NHIỀU LẦN)
+      lootedChapters: {},
       inventory: [
-        { id: "init-1", name: "Mẩu Bánh Mì Mốc", rank: "F", type: "FOOD", icon: "🍞", desc: "Khô khốc, nhưng có thể chống đói lúc tuyệt vọng." },
+        { id: "init-1", name: "Mẩu Bánh Mì Mốc", rank: "F", type: "FOOD", icon: "🍞", desc: "Khô khốc, chống đói lúc tuyệt vọng." },
         { id: "init-2", name: "Dao Gọt Trái Cây Cũ", rank: "E", type: "WEAPON", icon: "🔪", desc: "Vũ khí thô sơ nhất để tự vệ." }
       ],
       quests: DEFAULT_SYSTEM_QUESTS
@@ -1201,7 +1115,6 @@
           userProfile = JSON.parse(saved);
         }
         if (!userProfile.lootedChapters) userProfile.lootedChapters = {};
-        
         userProfile.role = "reader";
 
         document.getElementById('account-status-btn').textContent = `👤 ${currentUsername}`;
@@ -1272,20 +1185,19 @@
         userProfile.currency = 50;
         userProfile.lootedChapters = {};
         userProfile.inventory = [
-          { id: "init-1", name: "Mẩu Bánh Mì Mốc", rank: "F", type: "FOOD", icon: "🍞", desc: "Khô khốc, nhưng có thể chống đói lúc tuyệt vọng." },
+          { id: "init-1", name: "Mẩu Bánh Mì Mốc", rank: "F", type: "FOOD", icon: "🍞", desc: "Khô khốc, chống đói lúc tuyệt vọng." },
           { id: "init-2", name: "Dao Gọt Trái Cây Cũ", rank: "E", type: "WEAPON", icon: "🔪", desc: "Vũ khí thô sơ nhất để tự vệ." }
         ];
         userProfile.quests = DEFAULT_SYSTEM_QUESTS;
       }
 
       userProfile.role = "reader";
-
       saveCurrentAccount();
       document.getElementById('account-status-btn').textContent = `👤 ${currentUsername}`;
       document.getElementById('profile-account-id').textContent = `ID: ${currentUsername}`;
       closeModals();
       applyUserRole();
-      showSystemAlert("ĐĂNG NHẬP THÀNH CÔNG", `Chào mừng thực thể [${currentUsername}] vào hệ thống!`);
+      showSystemAlert("ĐĂNG NHẬP THÀNH CÔNG", `Chào mừng [${currentUsername}] vào hệ thống!`);
       renderHome();
     }
 
@@ -1310,7 +1222,6 @@
     let questTab = "ALL";
     let isZen = false;
 
-    // COOLDOWN NHẶT ĐỒ Ở KHO (10 PHÚT)
     const COOLDOWN_DURATION = 10 * 60 * 1000;
     let lastLootTimestamp = parseInt(localStorage.getItem('my_last_loot_ts')) || 0;
     let cooldownTimerInterval = null;
@@ -1346,10 +1257,10 @@
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }, { merge: true })
       .then(() => {
-        if (indicator) indicator.textContent = "☁️ Đã lưu đám mây";
+        if (indicator) indicator.textContent = "☁️ Đã lưu mây";
       })
       .catch((err) => {
-        if (indicator) indicator.textContent = "⚠️ Lưu offline";
+        if (indicator) indicator.textContent = "⚠️ Offline";
       });
     }
 
@@ -1419,9 +1330,6 @@
       });
       const statChEl = document.getElementById('stat-chapters');
       if (statChEl) statChEl.textContent = totalCh;
-
-      const statWEl = document.getElementById('stat-total-words');
-      if (statWEl) statWEl.textContent = totalW;
     }
 
     function addExp(amount) {
@@ -1446,12 +1354,8 @@
       saveCurrentAccount();
     }
 
-    // ==========================================
-    // CHẶN LẶP THÔNG BÁO NHIỆM VỤ
-    // ==========================================
     function advanceQuest(questId, amount = 1) {
       const q = userProfile.quests.find(item => item.id === questId);
-      
       if (!q || q.claimed || q.current >= q.target) {
         return;
       }
@@ -1508,10 +1412,8 @@
           const remainSec = Math.ceil((COOLDOWN_DURATION - diff) / 1000);
           const mins = Math.floor(remainSec / 60);
           const secs = remainSec % 60;
-          const timeFormatted = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-
           btn.disabled = true;
-          btn.textContent = `⏳ Chờ ${timeFormatted}`;
+          btn.textContent = `⏳ ${mins}:${secs < 10 ? '0' : ''}${secs}`;
         } else {
           btn.disabled = false;
           btn.textContent = `🎲 Nhặt đồ`;
@@ -1524,9 +1426,6 @@
       cooldownTimerInterval = setInterval(updateBtnState, 1000);
     }
 
-    // ==========================================
-    // KHÓA BUG TÀN TÍCH CUỐI CHƯƠNG (CHỈ NHẶT 1 LẦN DUY NHẤT)
-    // ==========================================
     function updateChapterLootButtonState() {
       const novel = novels[selectedNovelIndex];
       const ch = novel && novel.chapters ? novel.chapters[selectedChapterIndex] : null;
@@ -1538,8 +1437,8 @@
       const lootKey = `${novel.id}_${ch.id || selectedChapterIndex}`;
       if (userProfile.lootedChapters && userProfile.lootedChapters[lootKey]) {
         lootBtn.disabled = true;
-        lootBtn.textContent = "✔ Đã thu thập tàn tích chương này";
-        lootDesc.textContent = "Bạn đã khám phá toàn bộ tàn tích của chương này rồi. Hãy đọc chương tiếp theo nhé!";
+        lootBtn.textContent = "✔ Đã thu thập tàn tích";
+        lootDesc.textContent = "Bạn đã khám phá toàn bộ tàn tích của chương này rồi.";
       } else {
         lootBtn.disabled = false;
         lootBtn.textContent = "🎲 Lục Lọi Bảo Vật Ngay";
@@ -1555,7 +1454,7 @@
       if (!userProfile.lootedChapters) userProfile.lootedChapters = {};
       
       if (userProfile.lootedChapters[lootKey]) {
-        showSystemAlert("KHÔNG CÒN TÀN TÍCH", "Chương này bạn đã nhặt quà rồi, không thể nhận thêm!");
+        showSystemAlert("KHÔNG CÒN TÀN TÍCH", "Chương này bạn đã nhặt quà rồi!");
         return;
       }
 
@@ -1571,22 +1470,22 @@
         const remainSec = Math.ceil((COOLDOWN_DURATION - (now - lastLootTimestamp)) / 1000);
         const mins = Math.floor(remainSec / 60);
         const secs = remainSec % 60;
-        showSystemAlert("HỆ THỐNG ĐANG NẠP LẠI", `Vui lòng chờ ${mins}p ${secs}s để nhặt tiếp!`);
+        showSystemAlert("HỆ THỐNG ĐANG NẠP LẠI", `Vui lòng chờ ${mins}p ${secs}s!`);
         return;
       }
 
       const roll = Math.random() * 10000;
       let targetRank = "F";
 
-      if (roll < 5000) targetRank = "F";        // 50%
-      else if (roll < 8000) targetRank = "E";   // 30%
-      else if (roll < 9200) targetRank = "D";   // 12%
-      else if (roll < 9700) targetRank = "C";   // 5%
-      else if (roll < 9900) targetRank = "B";   // 2%
-      else if (roll < 9970) targetRank = "A";   // 0.7%
-      else if (roll < 9995) targetRank = "S";   // 0.25%
-      else if (roll < 9999) targetRank = "SS";  // 0.04%
-      else targetRank = "SSS";                  // 0.01%
+      if (roll < 5000) targetRank = "F";
+      else if (roll < 8000) targetRank = "E";
+      else if (roll < 9200) targetRank = "D";
+      else if (roll < 9700) targetRank = "C";
+      else if (roll < 9900) targetRank = "B";
+      else if (roll < 9970) targetRank = "A";
+      else if (roll < 9995) targetRank = "S";
+      else if (roll < 9999) targetRank = "SS";
+      else targetRank = "SSS";
 
       const pool = MASTER_LOOT_TABLE.filter(item => item.rank === targetRank);
       const picked = pool[Math.floor(Math.random() * pool.length)] || MASTER_LOOT_TABLE[0];
@@ -1653,7 +1552,7 @@
 
           const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
           document.getElementById('story-modal-cover-base64').value = compressedDataUrl;
-          document.getElementById('story-modal-cover-url').value = "[Đã tải và nén ảnh thành công]";
+          document.getElementById('story-modal-cover-url').value = "[Đã tải và nén ảnh]";
         };
         img.src = e.target.result;
       };
@@ -1773,10 +1672,8 @@
 
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div style="grid-column: 1/-1; text-align: center; padding: 40px 10px; color: var(--text-dim);">
-            <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
-            <div>Không tìm thấy tác phẩm nào phù hợp với bộ lọc hiện tại.</div>
-            <button class="btn" style="margin-top: 12px;" onclick="resetAllFilters()">Đặt lại bộ lọc</button>
+          <div style="grid-column: 1/-1; text-align: center; padding: 30px 10px; color: var(--text-dim); font-size: 13px;">
+            Không tìm thấy tác phẩm phù hợp.
           </div>
         `;
         return;
@@ -1790,7 +1687,7 @@
         card.onclick = () => openCover(originalIndex);
 
         const coverBg = novel.coverImage ? `background-image: url('${novel.coverImage}');` : '';
-        const tagBadgesHtml = (novel.genre || "Tiểu thuyết").split(/[,/]+/).map(t => `<span class="tag">${escapeHtml(t.trim())}</span>`).join(" ");
+        const tagBadgesHtml = (novel.genre || "Tiểu thuyết").split(/[,/]+/).slice(0, 3).map(t => `<span class="tag">${escapeHtml(t.trim())}</span>`).join(" ");
 
         const bookmark = JSON.parse(localStorage.getItem(`bookmark_${novel.id}`));
         let readButtonText = "▶ Đọc ngay";
@@ -1813,8 +1710,8 @@
               <div class="novel-desc">${escapeHtml(novel.desc || novel.title)}</div>
             </div>
             <div class="novel-meta">
-              <span style="color:var(--text-dim)">⏱ Cập nhật: <b>${latestDate}</b></span>
-              <button class="${readButtonClass}" style="padding: 3px 10px; font-size: 11px;" onclick="smartReadAction(${originalIndex}, event)">${readButtonText}</button>
+              <span style="color:var(--text-dim)">⏱ ${latestDate}</span>
+              <button class="${readButtonClass}" style="padding: 3px 8px; font-size: 10px;" onclick="smartReadAction(${originalIndex}, event)">${readButtonText}</button>
             </div>
           </div>
         `;
@@ -1832,9 +1729,6 @@
       sortMode = "NEWEST_UPDATE";
       document.getElementById('search-novel-input').value = "";
       document.getElementById('sort-select-ctrl').value = "NEWEST_UPDATE";
-      document.querySelectorAll('.filter-status-row .filter-btn').forEach((b, idx) => {
-        b.classList.toggle('active', idx === 0);
-      });
       renderHome();
     }
 
@@ -1850,7 +1744,6 @@
       document.getElementById('book-author').textContent = novel.author || userProfile.name;
       document.getElementById('book-status').textContent = novel.status || "Đang ra";
       document.getElementById('book-chapter-count').textContent = `${novel.chapters.length} chương`;
-      document.getElementById('book-word-count').textContent = `${getNovelTotalWords(novel)} chữ`;
       document.getElementById('book-desc').textContent = novel.desc || "Chưa có tóm tắt.";
 
       const coverContainer = document.getElementById('book-cover-art-container');
@@ -1886,7 +1779,7 @@
       chContainer.innerHTML = "";
 
       if (novel.chapters.length === 0) {
-        chContainer.innerHTML = `<div style="color: var(--text-dim); font-size: 14px;">Chưa có chương nào. Hãy bấm "+ Viết chương mới"!</div>`;
+        chContainer.innerHTML = `<div style="color: var(--text-dim); font-size: 13px;">Chưa có chương nào.</div>`;
         return;
       }
 
@@ -1899,11 +1792,11 @@
         item.innerHTML = `
           <div class="chapter-name-click" onclick="readChapter(${ch.originalIdx})">
             <div>${escapeHtml(ch.title)}</div>
-            <div style="font-size:11px; color:var(--text-dim);">${ch.wordCount || countWords(ch.content)} từ • ${ch.updatedAt || 'Mới'}</div>
+            <div style="font-size:10px; color:var(--text-dim);">${ch.wordCount || countWords(ch.content)} từ</div>
           </div>
-          <div style="display:flex; gap:8px;" class="admin-only">
-            <button class="btn" style="padding: 3px 8px; font-size: 11px;" onclick="openEditChapterModal(${ch.originalIdx})">Sửa</button>
-            <button class="btn btn-danger" style="padding: 3px 8px; font-size: 11px;" onclick="deleteChapter(${ch.originalIdx})">Xóa</button>
+          <div style="display:flex; gap:6px;" class="admin-only">
+            <button class="btn" style="padding: 2px 6px; font-size: 10px;" onclick="openEditChapterModal(${ch.originalIdx})">Sửa</button>
+            <button class="btn btn-danger" style="padding: 2px 6px; font-size: 10px;" onclick="deleteChapter(${ch.originalIdx})">Xóa</button>
           </div>
         `;
         chContainer.appendChild(item);
@@ -1917,7 +1810,7 @@
     }
 
     function deleteCurrentNovel() {
-      if (confirm(`Bạn có chắc muốn xóa vĩnh viễn tác phẩm "${novels[selectedNovelIndex].title}" không?`)) {
+      if (confirm(`Bạn có chắc muốn xóa tác phẩm "${novels[selectedNovelIndex].title}" không?`)) {
         novels.splice(selectedNovelIndex, 1);
         saveDB();
         goHome();
@@ -1936,12 +1829,11 @@
       document.getElementById('cover-view').style.display = 'none';
       document.getElementById('reader-view').style.display = 'block';
 
-      document.getElementById('reader-book-name').textContent = novel.title;
       document.getElementById('reader-ch-title').textContent = ch.title;
 
       const wCount = ch.wordCount || countWords(ch.content);
       const estMinutes = Math.max(1, Math.round(wCount / 250));
-      document.getElementById('reader-ch-time').textContent = `⏱ Khoảng ${estMinutes} phút đọc (${wCount} từ)`;
+      document.getElementById('reader-ch-time').textContent = `⏱ ${estMinutes} phút đọc (${wCount} từ)`;
 
       const paragraphs = ch.content.split('\n').filter(p => p.trim() !== "");
       const contentEl = document.getElementById('reader-content');
@@ -1968,7 +1860,6 @@
         scrollTop: scrollPos || 0
       }));
 
-      // Cập nhật trạng thái nhận tàn tích của chương này
       updateChapterLootButtonState();
 
       addExp(5);
@@ -1986,7 +1877,6 @@
       if (selectedChapterIndex < novel.chapters.length - 1) readChapter(selectedChapterIndex + 1);
     }
 
-    // LẮNG NGHE CUỘN: HIỆN NÚT NỔI VÀ LƯU BOOKMARK
     window.addEventListener('scroll', () => {
       const isReaderActive = document.getElementById('reader-view').style.display === 'block';
       const floatBar = document.getElementById('floating-reading-bar');
@@ -1997,7 +1887,7 @@
         const scrolled = (winScroll / height) * 100;
         document.getElementById('reading-bar').style.width = scrolled + '%';
 
-        if (winScroll > 200) {
+        if (winScroll > 180) {
           floatBar.style.display = 'flex';
         } else {
           floatBar.style.display = 'none';
@@ -2013,22 +1903,6 @@
       } else {
         document.getElementById('reading-bar').style.width = '0%';
         floatBar.style.display = 'none';
-      }
-    });
-
-    window.addEventListener('keydown', (e) => {
-      if (document.getElementById('reader-view').style.display === 'block') {
-        if (e.key === 'ArrowLeft') prevChapter();
-        if (e.key === 'ArrowRight') nextChapter();
-      }
-      if (e.key === 'p' || e.key === 'P') {
-        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-          togglePhone();
-        }
-      }
-      if (e.key === 'Escape') {
-        closeModals();
-        if (isZen) toggleZenMode();
       }
     });
 
@@ -2096,7 +1970,7 @@
       let finalCover = "";
       if (coverBase64) {
         finalCover = coverBase64;
-      } else if (coverUrlInput && coverUrlInput !== "[Đã tải và nén ảnh thành công]") {
+      } else if (coverUrlInput && coverUrlInput !== "[Đã tải và nén ảnh]") {
         finalCover = coverUrlInput;
       }
 
@@ -2158,7 +2032,7 @@
       document.getElementById('chapter-modal-heading').textContent = "VIẾT CHƯƠNG MỚI";
       
       const draft = JSON.parse(localStorage.getItem('my_auto_draft'));
-      if (draft && draft.content && confirm("Phát hiện một bản thảo chưa lưu trước đó. Bạn có muốn khôi phục không?")) {
+      if (draft && draft.content && confirm("Phát hiện bản thảo chưa lưu. Khôi phục lại?")) {
         document.getElementById('chapter-modal-title').value = draft.title || '';
         document.getElementById('chapter-modal-content').value = draft.content || '';
       } else {
@@ -2203,7 +2077,6 @@
 
       const wordCount = countWords(content);
       const nowStr = new Date().toISOString().slice(0, 10);
-
       novels[selectedNovelIndex].updatedAt = nowStr;
 
       if (editingChapterIndex !== null) {
@@ -2260,7 +2133,7 @@
       novels.forEach((n, idx) => {
         const opt = document.createElement('option');
         opt.value = n.id;
-        opt.textContent = `${n.title} (${(n.characters || []).length} nhân vật)`;
+        opt.textContent = `${n.title}`;
         if (idx === selectedNovelIndex) opt.selected = true;
         selector.appendChild(opt);
       });
@@ -2271,10 +2144,8 @@
       const container = document.getElementById('codex-container');
       container.innerHTML = "";
 
-      advanceQuest('q_hidden_codex', 1);
-
       if (!novel || !novel.characters || novel.characters.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding: 20px 10px; color: #64748b; font-size: 11px;">Chưa có nhân vật nào.<br>Bấm "+ Thêm" để tạo hồ sơ!</div>`;
+        container.innerHTML = `<div style="text-align:center; padding: 16px 8px; color: #64748b; font-size: 11px;">Chưa có nhân vật nào.</div>`;
         return;
       }
 
@@ -2282,18 +2153,17 @@
         const div = document.createElement('div');
         div.className = 'character-card';
         div.innerHTML = `
-          <div style="font-size: 20px; line-height: 1;">👤</div>
+          <div style="font-size: 18px;">👤</div>
           <div style="flex:1;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size: 12px; font-weight: bold; color: var(--neon);">${escapeHtml(c.name)}</span>
-              <span style="font-size: 9px; color: var(--text-dim);">[${escapeHtml(c.role || 'Chưa rõ')}]</span>
+              <span style="font-size: 11px; font-weight: bold; color: var(--neon);">${escapeHtml(c.name)}</span>
+              <span style="font-size: 9px; color: var(--text-dim);">[${escapeHtml(c.role || '')}]</span>
             </div>
-            <div style="font-size: 10px; color: var(--red); margin-top:2px;">Trạng thái: ${escapeHtml(c.status || 'Chưa cập nhật')}</div>
-            <div style="font-size: 10px; color: #94a3b8; margin-top:2px; line-height:1.4;">${escapeHtml(c.note || '')}</div>
+            <div style="font-size: 9px; color: var(--red); margin-top:1px;">${escapeHtml(c.status || '')}</div>
           </div>
-          <div style="display:flex; flex-direction:column; gap:4px;" class="admin-only">
-            <button class="btn" style="padding: 2px 6px; font-size: 9px;" onclick="openEditCharacterModal(${idx})">Sửa</button>
-            <button class="btn btn-danger" style="padding: 2px 6px; font-size: 9px;" onclick="deleteCharacterFromCodex(${idx})">Xóa</button>
+          <div style="display:flex; flex-direction:column; gap:2px;" class="admin-only">
+            <button class="btn" style="padding: 1px 4px; font-size: 8px;" onclick="openEditCharacterModal(${idx})">Sửa</button>
+            <button class="btn btn-danger" style="padding: 1px 4px; font-size: 8px;" onclick="deleteCharacterFromCodex(${idx})">Xóa</button>
           </div>
         `;
         container.appendChild(div);
@@ -2304,7 +2174,6 @@
     function openAddCharacterModal() {
       const novel = getSelectedCodexNovel();
       if (!novel) { alert("Vui lòng tạo truyện trước!"); return; }
-
       editingCharIndex = null;
       document.getElementById('char-modal-heading').textContent = `THÊM NHÂN VẬT - [${novel.title}]`;
       document.getElementById('char-input-name').value = '';
@@ -2318,7 +2187,6 @@
       const novel = getSelectedCodexNovel();
       editingCharIndex = idx;
       const c = novel.characters[idx];
-
       document.getElementById('char-modal-heading').textContent = `CHỈNH SỬA: ${c.name}`;
       document.getElementById('char-input-name').value = c.name;
       document.getElementById('char-input-role').value = c.role || '';
@@ -2335,19 +2203,12 @@
       const note = document.getElementById('char-input-note').value.trim();
 
       if (!name) { alert("Vui lòng nhập tên nhân vật!"); return; }
-
       if (!novel.characters) novel.characters = [];
 
       if (editingCharIndex !== null) {
-        novel.characters[editingCharIndex] = {
-          ...novel.characters[editingCharIndex],
-          name, role, status, note
-        };
+        novel.characters[editingCharIndex] = { ...novel.characters[editingCharIndex], name, role, status, note };
       } else {
-        novel.characters.push({
-          id: "char-" + Date.now(),
-          name, role, status, note
-        });
+        novel.characters.push({ id: "char-" + Date.now(), name, role, status, note });
       }
 
       saveDB();
@@ -2358,7 +2219,7 @@
 
     function deleteCharacterFromCodex(idx) {
       const novel = getSelectedCodexNovel();
-      if (confirm(`Bạn có chắc muốn xóa nhân vật "${novel.characters[idx].name}" khỏi sổ tay?`)) {
+      if (confirm(`Bạn có chắc muốn xóa nhân vật "${novel.characters[idx].name}"?`)) {
         novel.characters.splice(idx, 1);
         saveDB();
         renderCodexDropdown();
@@ -2423,7 +2284,7 @@
       }
 
       if (items.length === 0) {
-        container.innerHTML = `<div style="text-align:center; color:#64748b; font-size:11px; padding:20px;">Hòm đồ mục này trống.<br>Hãy bấm "🎲 Nhặt đồ" hoặc đọc chương mới!</div>`;
+        container.innerHTML = `<div style="text-align:center; color:#64748b; font-size:11px; padding:16px;">Hòm đồ mục này trống.</div>`;
         return;
       }
 
@@ -2431,15 +2292,15 @@
         const div = document.createElement('div');
         div.className = 'item-card';
         div.innerHTML = `
-          <div style="font-size:24px;">${item.icon}</div>
+          <div style="font-size:20px;">${item.icon}</div>
           <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:6px;">
+            <div style="display:flex; align-items:center; gap:4px;">
               <span class="rank-tag rank-${item.rank}">${item.rank}</span>
-              <span style="font-size:12px; font-weight:bold; color:var(--text-white);">${escapeHtml(item.name)}</span>
+              <span style="font-size:11px; font-weight:bold; color:var(--text-white);">${escapeHtml(item.name)}</span>
             </div>
-            <div style="font-size:10px; color:#94a3b8; margin-top:2px;">${escapeHtml(item.desc)}</div>
+            <div style="font-size:9px; color:#94a3b8; margin-top:1px;">${escapeHtml(item.desc)}</div>
           </div>
-          <button class="btn btn-danger" style="padding:2px 6px; font-size:9px;" onclick="discardItem(${idx})">Vứt</button>
+          <button class="btn btn-danger" style="padding:1px 5px; font-size:8px;" onclick="discardItem(${idx})">Vứt</button>
         `;
         container.appendChild(div);
       });
@@ -2468,7 +2329,7 @@
       }
 
       if (list.length === 0) {
-        container.innerHTML = `<div style="text-align:center; color:#64748b; font-size:11px; padding:20px;">Không có nhiệm vụ ở danh mục này.</div>`;
+        container.innerHTML = `<div style="text-align:center; color:#64748b; font-size:11px; padding:16px;">Không có nhiệm vụ mục này.</div>`;
         return;
       }
 
@@ -2481,20 +2342,19 @@
 
         let actionBtnHtml = '';
         if (q.claimed) {
-          actionBtnHtml = `<span style="font-size:11px; color:#10b981; font-weight:bold;">✔ Đã nhận thưởng</span>`;
+          actionBtnHtml = `<span style="font-size:10px; color:#10b981; font-weight:bold;">✔ Đã nhận</span>`;
         } else if (isReady) {
-          actionBtnHtml = `<button class="btn btn-primary" style="padding:4px 8px; font-size:10px; background:var(--gold); border-color:var(--gold); color:#000; font-weight:bold;" onclick="claimQuestReward('${q.id}')">🎁 Nhận Thưởng</button>`;
+          actionBtnHtml = `<button class="btn btn-primary" style="padding:2px 6px; font-size:9px; background:var(--gold); border-color:var(--gold); color:#000; font-weight:bold;" onclick="claimQuestReward('${q.id}')">🎁 Nhận</button>`;
         } else {
-          actionBtnHtml = `<span style="font-size:10px; color:#94a3b8;">Đang tiến hành (${q.current}/${q.target})</span>`;
+          actionBtnHtml = `<span style="font-size:9px; color:#94a3b8;">(${q.current}/${q.target})</span>`;
         }
 
         div.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span class="quest-type-tag quest-type-${q.type}">${q.type === 'MAIN' ? 'Chính tuyến' : (q.type === 'DAILY' ? 'Hàng ngày' : 'Nhiệm vụ ẩn')}</span>
-            <span style="font-size:10px; color:var(--gold); font-weight:bold;">+${q.rewardExp} EXP | +${q.rewardCoin} 🪙 Xu</span>
+            <span class="rank-tag rank-D">${q.type}</span>
+            <span style="font-size:9px; color:var(--gold); font-weight:bold;">+${q.rewardCoin} 🪙</span>
           </div>
-          <div style="font-size:12px; font-weight:bold; color:var(--text-white); margin-top:2px;">${escapeHtml(q.title)}</div>
-          <div style="font-size:10px; color:#94a3b8; line-height:1.4;">${escapeHtml(q.desc)}</div>
+          <div style="font-size:11px; font-weight:bold; color:var(--text-white); margin-top:2px;">${escapeHtml(q.title)}</div>
           <div class="quest-prog-bar">
             <div class="quest-prog-fill" style="width: ${percent}%;"></div>
           </div>
@@ -2515,16 +2375,15 @@
         const div = document.createElement('div');
         div.className = 'item-card';
         div.innerHTML = `
-          <div style="font-size:22px;">${item.icon}</div>
+          <div style="font-size:18px;">${item.icon}</div>
           <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:6px;">
+            <div style="display:flex; align-items:center; gap:4px;">
               <span class="rank-tag rank-${item.rank}">${item.rank}</span>
-              <span style="font-size:12px; font-weight:bold; color:var(--text-white);">${escapeHtml(item.name)}</span>
+              <span style="font-size:11px; font-weight:bold; color:var(--text-white);">${escapeHtml(item.name)}</span>
             </div>
-            <div style="font-size:10px; color:#94a3b8;">${escapeHtml(item.desc)}</div>
-            <div style="font-size:10px; color:var(--gold); font-weight:bold; margin-top:2px;">Giá: ${item.price} 🪙 Xu</div>
+            <div style="font-size:9px; color:var(--gold); font-weight:bold; margin-top:1px;">${item.price} 🪙 Xu</div>
           </div>
-          <button class="btn" style="padding:4px 8px; font-size:10px;" onclick="buyShopItem('${item.id}')">Mua</button>
+          <button class="btn" style="padding:3px 6px; font-size:9px;" onclick="buyShopItem('${item.id}')">Mua</button>
         `;
         container.appendChild(div);
       });
@@ -2535,7 +2394,7 @@
       if (!item) return;
 
       if (userProfile.currency < item.price) {
-        alert("Bạn không đủ Xu Ký Tự! Hãy đọc truyện, làm nhiệm vụ hoặc nhặt đồ để tích lũy thêm xu.");
+        alert("Bạn không đủ Xu Ký Tự!");
         return;
       }
 
@@ -2552,11 +2411,6 @@
       document.documentElement.style.setProperty('--read-size', size + 'px');
     }
 
-    function setReadingFont(type) {
-      const font = (type === 'serif') ? "Georgia, 'Times New Roman', serif" : "'Segoe UI', -apple-system, Roboto, sans-serif";
-      document.documentElement.style.setProperty('--font-reading', font);
-    }
-
     function setTheme(theme) {
       document.body.className = '';
       if (theme === 'warm') document.body.classList.add('theme-warm');
@@ -2564,21 +2418,10 @@
       applyUserRole();
     }
 
-    function exportData() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ novels, userProfile }));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `dudu_studio_backup_${new Date().toISOString().slice(0,10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    }
-
     function escapeHtml(str) {
       return (str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    // KHỞI ĐỘNG HỆ THỐNG
     loadLocalAccountProfile();
     renderHome();
     startCooldownTicker();
